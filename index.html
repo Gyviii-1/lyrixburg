@@ -4492,6 +4492,43 @@
         if (btn) btn.textContent = (saved === 'gold') ? '💜' : '✨';
       }
     })();
+
+    // ===== BASIC PAGE PROTECTION =====
+    // Block right-click
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+    // Block keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      // F12
+      if (e.key === 'F12') { e.preventDefault(); return; }
+      // Ctrl+U (view source)
+      if (e.ctrlKey && e.key === 'u') { e.preventDefault(); return; }
+      // Ctrl+S (save)
+      if (e.ctrlKey && e.key === 's') { e.preventDefault(); return; }
+      // Ctrl+Shift+I (devtools)
+      if (e.ctrlKey && e.shiftKey && e.key === 'I') { e.preventDefault(); return; }
+      // Ctrl+Shift+J (console)
+      if (e.ctrlKey && e.shiftKey && e.key === 'J') { e.preventDefault(); return; }
+      // Ctrl+Shift+C (inspector)
+      if (e.ctrlKey && e.shiftKey && e.key === 'C') { e.preventDefault(); return; }
+    });
   </script>
+
+  <style>
+    /* Disable text selection */
+    body {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    /* Allow selection in input fields */
+    input, textarea, .review-text, .oath-text {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+  </style>
 </body>
 </html>
