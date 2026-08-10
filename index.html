@@ -634,6 +634,27 @@
       font-style: italic;
     }
 
+    /* ===== CUSTOM TAGS ===== */
+    .role-badge.badge-custom {
+      font-size: 0.6rem;
+    }
+    .custom-tag-colors {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+    .tag-color-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tag-color-btn:hover { transform: scale(1.2); }
+    .tag-color-btn.selected { border-color: white; box-shadow: 0 0 8px currentColor; }
+
     /* ===== VERSION BADGE ===== */
     .nav-version {
       font-size: 0.6rem;
@@ -2988,6 +3009,38 @@
         <button class="btn-gold" style="width:100%; padding:14px;" onclick="assignRole()">
           👑 Назначить роль
         </button>
+
+        <!-- Custom Tag Section -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 20px; padding-top: 20px;">
+          <div style="color:var(--gold); font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom: 12px;">🏷️ Кастомный тег</div>
+          <div class="field">
+            <label for="tagNick">Ник игрока</label>
+            <input type="text" id="tagNick" placeholder="Кому назначить тег" maxlength="20">
+          </div>
+          <div class="field">
+            <label for="tagText">Текст тега</label>
+            <input type="text" id="tagText" placeholder="Например: VIP, Строитель, Легенда" maxlength="20">
+          </div>
+          <div class="field">
+            <label>Цвет тега</label>
+            <div class="custom-tag-colors" id="tagColors">
+              <div class="tag-color-btn selected" data-color="#E040FB" style="background:#E040FB;" onclick="pickTagColor(this)"></div>
+              <div class="tag-color-btn" data-color="#64B5F6" style="background:#64B5F6;" onclick="pickTagColor(this)"></div>
+              <div class="tag-color-btn" data-color="#81C784" style="background:#81C784;" onclick="pickTagColor(this)"></div>
+              <div class="tag-color-btn" data-color="#FFB74D" style="background:#FFB74D;" onclick="pickTagColor(this)"></div>
+              <div class="tag-color-btn" data-color="#FF7043" style="background:#FF7043;" onclick="pickTagColor(this)"></div>
+              <div class="tag-color-btn" data-color="#EF5350" style="background:#EF5350;" onclick="pickTagColor(this)"></div>
+              <div class="tag-color-btn" data-color="#FFD700" style="background:#FFD700;" onclick="pickTagColor(this)"></div>
+              <div class="tag-color-btn" data-color="#FFFFFF" style="background:#FFFFFF;" onclick="pickTagColor(this)"></div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-gold" style="flex:1; padding:12px;" onclick="assignCustomTag()">🏷️ Назначить тег</button>
+            <button class="btn-gold ghost" style="padding:12px;" onclick="removeCustomTag()">Убрать тег</button>
+          </div>
+          <div class="modal-error" id="tagError" style="margin-top:8px;"></div>
+          <div class="modal-success" id="tagSuccess" style="color:#81C784; font-size:0.85rem; text-align:center; min-height:18px; margin-top:6px;"></div>
+        </div>
       </div>
 
       <!-- Registered users list -->
@@ -3594,7 +3647,9 @@
               uid: d.id,
               name: data.username || data.displayName || '—',
               role: data.role || 'user',
-              previousRole: data.previousRole || 'user'
+              previousRole: data.previousRole || 'user',
+              customTag: data.customTag || '',
+              customTagColor: data.customTagColor || ''
             });
           });
           // Мэр первым, потом зам, потом админы, потом шерифы, потом обычные, потом заблокированные
@@ -3630,10 +3685,11 @@
             } else {
               roleTag = '<span class="reg-user-role-tag ' + tagClass + '">' + tagText + '</span>';
             }
+            var customBadge = u.customTag ? '<span class="role-badge badge-custom" style="background:' + u.customTagColor + '20; border:1px solid ' + u.customTagColor + '55; color:' + u.customTagColor + ';">' + esc(u.customTag) + '</span>' : '';
             return '<div class="reg-user-row">' +
               '<div class="reg-user-avatar-sm">' + esc(ini) + '</div>' +
               '<span class="reg-user-name">' + esc(u.name) + '</span>' +
-              roleTag +
+              roleTag + customBadge +
               actionBtn +
               '</div>';
           }).join('');
@@ -3683,6 +3739,69 @@
       sel.addEventListener('blur', function() {
         loadRegisteredUsers();
       });
+    }
+
+    // ===== CUSTOM TAGS =====
+    var selectedTagColor = '#E040FB';
+
+    function pickTagColor(el) {
+      document.querySelectorAll('.tag-color-btn').forEach(function(b) { b.classList.remove('selected'); });
+      el.classList.add('selected');
+      selectedTagColor = el.getAttribute('data-color');
+    }
+
+    function assignCustomTag() {
+      if (!hasMayorRights()) { showToast('⛔ Только для Мэра и Зама', true); return; }
+      var nick = document.getElementById('tagNick').value.trim();
+      var text = document.getElementById('tagText').value.trim();
+      var errEl = document.getElementById('tagError');
+      var successEl = document.getElementById('tagSuccess');
+      errEl.textContent = ''; successEl.textContent = '';
+
+      if (nick.length < 2) { errEl.textContent = 'Введите ник'; return; }
+      if (text.length < 1) { errEl.textContent = 'Введите текст тега'; return; }
+
+      db.collection('users').where('username', '==', nick).get()
+        .then(function(snap) {
+          if (snap.empty) { errEl.textContent = 'Игрок «' + nick + '» не найден'; return; }
+          return db.collection('users').doc(snap.docs[0].id).update({
+            customTag: text,
+            customTagColor: selectedTagColor
+          }).then(function() {
+            successEl.textContent = '✅ Тег «' + text + '» назначен для ' + nick;
+            showToast('🏷️ Тег обновлён для ' + nick);
+            writeLog('set_tag', nick + ' → «' + text + '»');
+            loadUsersCache();
+            loadRegisteredUsers();
+          });
+        })
+        .catch(function(e) { errEl.textContent = 'Ошибка: ' + (e.message || e.code); });
+    }
+
+    function removeCustomTag() {
+      if (!hasMayorRights()) { showToast('⛔ Только для Мэра и Зама', true); return; }
+      var nick = document.getElementById('tagNick').value.trim();
+      var errEl = document.getElementById('tagError');
+      var successEl = document.getElementById('tagSuccess');
+      errEl.textContent = ''; successEl.textContent = '';
+
+      if (nick.length < 2) { errEl.textContent = 'Введите ник'; return; }
+
+      db.collection('users').where('username', '==', nick).get()
+        .then(function(snap) {
+          if (snap.empty) { errEl.textContent = 'Игрок «' + nick + '» не найден'; return; }
+          return db.collection('users').doc(snap.docs[0].id).update({
+            customTag: firebase.firestore.FieldValue.delete(),
+            customTagColor: firebase.firestore.FieldValue.delete()
+          }).then(function() {
+            successEl.textContent = '✅ Тег убран у ' + nick;
+            showToast('🏷️ Тег убран у ' + nick);
+            writeLog('remove_tag', nick);
+            loadUsersCache();
+            loadRegisteredUsers();
+          });
+        })
+        .catch(function(e) { errEl.textContent = 'Ошибка: ' + (e.message || e.code); });
     }
 
     function assignRole() {
@@ -4163,12 +4282,32 @@
 
     // Найти ник по UID (из кэша ratingsData или показать короткий UID)
     function findUsernameByUid(uid) {
-      // Поискать среди отзывов
       for (var i = 0; i < ratingsData.length; i++) {
         if (ratingsData[i].oderId === uid) return ratingsData[i].user;
       }
-      // Поискать среди жителей не получится (там нет uid), вернём короткий id
       return uid.substring(0, 8) + '…';
+    }
+
+    // Cache of user data for custom tags
+    var usersCache = {};
+    function loadUsersCache() {
+      db.collection('users').get().then(function(snap) {
+        usersCache = {};
+        snap.forEach(function(d) {
+          var data = d.data();
+          var name = data.username || data.displayName || '';
+          if (name) usersCache[name.toLowerCase()] = data;
+        });
+      });
+    }
+    loadUsersCache();
+
+    function getCustomTag(username) {
+      var u = usersCache[username.toLowerCase()];
+      if (u && u.customTag) {
+        return '<span class="role-badge badge-custom" style="background:' + u.customTagColor + '20; border:1px solid ' + u.customTagColor + '55; color:' + u.customTagColor + ';">' + esc(u.customTag) + '</span>';
+      }
+      return '';
     }
 
     function removeVote(reviewId, targetUid, type) {
@@ -4385,6 +4524,7 @@
           return '<div class="review-item"><div class="review-head">' +
             '<span class="review-author">' + esc(r.user) + '</span>' +
             roleBadge +
+            getCustomTag(r.user) +
             '<span class="review-stars">' + starStr(r.stars) + '</span>' +
             editedBadge +
             '<span class="review-date">' + dateStr + '</span>' +
