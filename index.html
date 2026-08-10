@@ -2940,6 +2940,19 @@
 
     const ADMIN_NAMES = ['w00fla', 'Kustik589'];
 
+    /* ==================== LOGGING ==================== */
+    function writeLog(action, details) {
+      try {
+        db.collection('logs').add({
+          action: action,
+          details: details || '',
+          user: (currentUser ? (getDisplayName ? getDisplayName() : currentUser.uid) : 'Гость'),
+          uid: currentUser ? currentUser.uid : null,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch(e) { console.warn('[Log Error]', e); }
+    }
+
     /* ==================== STATE ==================== */
     let currentUser = null;
     let currentUserData = null;
@@ -3086,9 +3099,11 @@
         });
         closeAuth();
         showToast('🎉 Успешная регистрация, ' + username.trim() + '!');
+        writeLog('register', 'Новый аккаунт: ' + username.trim() + ' | IP: ' + userIp);
       } catch (error) {
         console.error('[Register FAIL]', error.code, error.message);
         document.getElementById('authError').textContent = error.message ? error.message : ('Ошибка регистрации: [' + error.code + ']');
+        writeLog('register_fail', 'Ник: ' + username.trim() + ' | Ошибка: ' + (error.code || error.message));
       }
     }
 
@@ -3099,9 +3114,11 @@
         await auth.signInWithEmailAndPassword(formalEmail, password);
         closeAuth();
         showToast('👋 Успешный вход!');
+        writeLog('login', 'Вход: ' + username.trim());
       } catch (error) {
         console.error('[Login FAIL]', error.code, error.message);
         document.getElementById('authError').textContent = 'Неверный ник или пароль [' + error.code + ']';
+        writeLog('login_fail', 'Ник: ' + username.trim() + ' | Ошибка: ' + (error.code || error.message));
       }
     }
 
@@ -3139,6 +3156,7 @@
         renderAuthBar();
         renderRateArea();
         renderReviews();
+        writeLog('logout', 'Выход из аккаунта');
         showToast('Вы вышли из аккаунта');
       });
     }
@@ -3416,6 +3434,7 @@
               var roleNames = { admin: 'Администратор', sheriff: 'Шериф', deputy: 'Зам', user: 'Пользователь' };
               successEl.textContent = '✅ ' + nick + ' → роль «' + (roleNames[role] || role) + '» назначена!';
               showToast('👑 Роль обновлена для ' + nick);
+              writeLog('assign_role', nick + ' → ' + (roleNames[role] || role));
               loadRegisteredUsers();
             });
         })
@@ -3449,6 +3468,7 @@
       })
       .then(function() {
         showToast('🚫 Аккаунт «' + name + '» заблокирован');
+        writeLog('block_user', 'Заблокирован: ' + name);
         loadRegisteredUsers();
       })
       .catch(function(e) {
@@ -3472,8 +3492,9 @@
           return batch.commit();
         })
         .then(function() {
-          showToast('🗑️ Документ «' + name + '» удалён из базы');
-          loadRegisteredUsers();
+        showToast('🗑️ Документ «' + name + '» удалён из базы');
+        writeLog('purge_user', 'Удалён из базы: ' + name);
+        loadRegisteredUsers();
         })
         .catch(function(e) {
           console.error('[Purge User Error]', e);
@@ -3493,6 +3514,7 @@
       })
       .then(function() {
         showToast('✅ Аккаунт «' + name + '» разблокирован');
+        writeLog('unblock_user', 'Разблокирован: ' + name);
         loadRegisteredUsers();
       })
       .catch(function(e) {
@@ -3857,6 +3879,7 @@
         await db.collection('ratings').doc(id).delete();
         if (target.oderId === currentUser?.uid) pickedStars = 0;
         showToast('🗑️ Оценка удалена');
+        writeLog('delete_rating', 'Удалена оценка от: ' + target.user);
       } catch (e) {
         console.error(e);
         showToast('❌ Ошибка удаления', true);
@@ -3913,6 +3936,7 @@
         adminReplyAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(function() {
         showToast('💬 Ответ опубликован!');
+        writeLog('admin_reply', 'Ответ на отзыв: ' + reviewId);
       }).catch(function(e) {
         console.error('[Reply Error]', e);
         showToast('❌ Ошибка: ' + (e.message || e.code), true);
@@ -3934,6 +3958,7 @@
         adminReplyAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(function() {
         showToast('✏️ Ответ изменён!');
+        writeLog('edit_reply', 'Изменён ответ на отзыв: ' + reviewId);
       }).catch(function(e) {
         showToast('❌ Ошибка: ' + (e.message || e.code), true);
       });
@@ -3949,6 +3974,7 @@
         adminReplyAt: firebase.firestore.FieldValue.delete()
       }).then(function() {
         showToast('🗑️ Ответ удалён');
+        writeLog('delete_reply', 'Удалён ответ на отзыв: ' + reviewId);
       }).catch(function(e) {
         showToast('❌ Ошибка: ' + (e.message || e.code), true);
       });
