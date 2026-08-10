@@ -612,6 +612,72 @@
       font-style: italic;
     }
 
+    /* ===== VERSION BADGE ===== */
+    .nav-version {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 2px 8px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+    .nav-version:hover {
+      color: var(--gold);
+      border-color: var(--border-gold);
+    }
+    .changelog-scroll {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .changelog-entry {
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .changelog-entry:last-child { border-bottom: none; }
+    .changelog-ver {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .changelog-tag {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--gold);
+      background: rgba(224,64,251,0.1);
+      border: 1px solid var(--border-gold);
+      padding: 3px 10px;
+      border-radius: 50px;
+    }
+    .changelog-date {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .changelog-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .changelog-list li {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 3px 0 3px 18px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .changelog-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--gold-dark);
+      font-weight: 700;
+    }
+
     /* ===== THEME TOGGLE ===== */
     .theme-toggle {
       position: fixed;
@@ -2263,7 +2329,7 @@
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <div class="nav-logo">⚖ Луриксбург</div>
+      <div class="nav-logo">⚖ Луриксбург <span class="nav-version" onclick="openChangelog()" title="История обновлений">v0.2.45</span></div>
       <ul class="nav-links" id="navLinks">
         <li><a href="#part1">Устав</a></li>
         <li><a href="#part2">Билль о правах</a></li>
@@ -2914,6 +2980,134 @@
     </div>
   </div>
 
+  <!-- ===== CHANGELOG MODAL ===== -->
+  <div class="modal" id="changelogModal">
+    <div class="modal-box" style="max-width: 600px;">
+      <button class="modal-close" onclick="closeChangelog()">×</button>
+      <div class="modal-title">📋 История обновлений</div>
+      <div class="modal-sub">Сводка всех изменений сайта</div>
+
+      <div class="changelog-scroll">
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.45</span>
+            <span class="changelog-date">18 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Добавлено логирование всех действий в Firestore (коллекция logs)</li>
+            <li>Роль «Зам» получила все права Мэра (назначение ролей, блокировка, удаление)</li>
+            <li>Сводка обновлений сайта с номером версии</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.42</span>
+            <span class="changelog-date">18 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Полный редизайн: фиолетовая/маджента тема под символику города</li>
+            <li>Переключатель тем: фиолетовая ↔ золотая (сохраняется в localStorage)</li>
+            <li>Все тексты обновлены: «Конституция» → «Устав города»</li>
+            <li>Иконка герба заменена на ⚖</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.38</span>
+            <span class="changelog-date">17 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Мобильная версия: выдвижное боковое меню, адаптивные карточки</li>
+            <li>Левая навигационная панель на десктопе (постоянная)</li>
+            <li>Стрелка вниз ↓ в начале и стрелка вверх ↑ в конце страницы</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.34</span>
+            <span class="changelog-date">17 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Сортировка жителей: Мэр → Зам → Шериф → Судья → Житель, внутри по алфавиту</li>
+            <li>Роли в реестре жителей: Мэр, Зам, Шериф, Судья</li>
+            <li>Редактирование и удаление ответов администрации на отзывы</li>
+            <li>Метка «(ред.)» при изменении оценки пользователем</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.28</span>
+            <span class="changelog-date">16 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Роль «Шериф» (синий бейдж, права админа)</li>
+            <li>Админы, Мэр и Шериф могут отвечать на оценки</li>
+            <li>Список зарегистрированных пользователей доступен админам (без назначения ролей)</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.22</span>
+            <span class="changelog-date">16 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Блокировка/разблокировка аккаунтов (Мэр)</li>
+            <li>Кнопка полного удаления документа из Firestore</li>
+            <li>Система голосования Reddit-стиль (▲ счёт ▼)</li>
+            <li>Админы видят кто голосовал и могут удалять голоса</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.16</span>
+            <span class="changelog-date">15 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Меню «👑 Роли» — Мэр может назначать роли пользователям</li>
+            <li>Список всех зарегистрированных пользователей</li>
+            <li>Тег «👑 Мэр» для w00fla во всех отзывах</li>
+            <li>Чёрный список: блокировка оценок + ссылка на Telegram</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.10</span>
+            <span class="changelog-date">15 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Реестр жителей Луриксбурга (Firestore коллекция citizens)</li>
+            <li>Бейджи ролей в отзывах: Админ, Житель, Гость, Заблокирован</li>
+            <li>Кнопка «Войти» в шапке → профиль с аватаром и сменой пароля</li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+          <div class="changelog-ver">
+            <span class="changelog-tag">v0.2.1</span>
+            <span class="changelog-date">14 июня 2025</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Интеграция Firebase: авторизация, Firestore база данных</li>
+            <li>Система оценок и отзывов в реальном времени</li>
+            <li>Скрытая почта login@luriksburg.local для регистрации</li>
+            <li>Защита от мультиаккаунтов по IP</li>
+            <li>Поиск по Уставу (Ctrl+K)</li>
+            <li>Прогресс-бар чтения, анимация частиц, оглавление</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- FIREBASE SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -2939,6 +3133,17 @@
     // (именно он вызывал баги с "уже зарегистрирован")
 
     const ADMIN_NAMES = ['w00fla', 'Kustik589'];
+
+    /* ==================== CHANGELOG ==================== */
+    function openChangelog() {
+      document.getElementById('changelogModal').classList.add('open');
+    }
+    function closeChangelog() {
+      document.getElementById('changelogModal').classList.remove('open');
+    }
+    document.getElementById('changelogModal').addEventListener('click', function(e) {
+      if (e.target.id === 'changelogModal') closeChangelog();
+    });
 
     /* ==================== LOGGING ==================== */
     function writeLog(action, details) {
@@ -4279,6 +4484,7 @@
         closeAuth();
         closeProfile();
         closeRoleManager();
+        closeChangelog();
       }
     });
 
