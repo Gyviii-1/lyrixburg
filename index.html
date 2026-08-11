@@ -138,6 +138,7 @@
       align-items: center;
       gap: 10px;
       height: 64px;
+      position: relative;
     }
 
     .nav-logo {
@@ -149,61 +150,33 @@
       letter-spacing: 2px;
       white-space: nowrap;
       flex-shrink: 0;
+      position: relative;
+      z-index: 2;
     }
 
-    /* Permanent sidebar on the left */
-    .nav-links {
-      position: fixed;
-      top: 78px;
-      left: 16px;
-      width: 220px;
-      max-height: calc(100vh - 94px);
-      background: var(--nav-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border-gold);
-      border-radius: 18px;
-      flex-direction: column;
-      padding: 14px;
-      gap: 6px;
-      list-style: none;
-      z-index: 1001;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
-      overflow-y: auto;
+    .nav-pages-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.88rem;
-      font-weight: 500;
-      padding: 12px 14px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      white-space: nowrap;
-      display: block;
+    .nav-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      z-index: 2;
     }
 
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: var(--gold);
-      background: rgba(212, 175, 55, 0.1);
-    }
-
-    .nav-overlay {
-      display: none;
-    }
-
-    .burger {
-      display: none;
-    }
-
-    .burger span {
-      display: none;
-    }
+    /* Sidebar removed — tabs are in header now */
+    .nav-links { display: none; }
+    .nav-overlay { display: none; }
+    .burger { display: none; }
+    .burger span { display: none; }
 
     /* ===== HEADER AUTH BUTTON ===== */
     .nav-auth-btn {
@@ -257,6 +230,16 @@
     }
 
     @media (max-width: 768px) {
+      .nav-pages-center {
+        position: static;
+        transform: none;
+        margin: 0 auto;
+        gap: 2px;
+      }
+      .nav-pages-center .nav-page-link {
+        font-size: 0.66rem !important;
+        padding: 6px 8px !important;
+      }
       .nav-auth-btn {
         padding: 6px 12px;
         font-size: 0.75rem;
@@ -636,6 +619,26 @@
       font-style: italic;
     }
 
+    /* ===== PAGE NAVIGATION ===== */
+    .nav-page-link {
+      position: relative;
+    }
+    .nav-page-link.active {
+      color: var(--gold) !important;
+      background: rgba(224, 64, 251, 0.1) !important;
+    }
+    .nav-page-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
     /* ===== CUSTOM TAGS ===== */
     .role-badge.badge-custom {
       font-size: 0.6rem;
@@ -894,14 +897,7 @@
       padding: 0 24px 100px;
     }
 
-    /* Layout shift for permanent left sidebar */
-    @media (min-width: 769px) {
-      .hero,
-      .content-wrapper,
-      .footer {
-        padding-left: 260px;
-      }
-    }
+    /* No sidebar offset needed */
 
     /* ===== SECTION ===== */
     .section {
@@ -1324,35 +1320,6 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-      /* Sidebar becomes slide-in drawer on mobile */
-      .nav-links {
-        position: fixed;
-        top: 0;
-        left: -280px;
-        width: 260px;
-        height: 100vh;
-        max-height: 100vh;
-        margin: 0;
-        border-radius: 0;
-        border: none;
-        border-right: 1px solid var(--border-gold);
-        box-shadow: 10px 0 40px rgba(0,0,0,0.5);
-        transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 80px 16px 30px;
-        z-index: 1002;
-      }
-
-      .nav-links.open {
-        left: 0;
-      }
-
-      .nav-overlay {
-        display: block;
-      }
-
-      .burger {
-        display: flex;
-      }
 
       .hero,
       .content-wrapper,
@@ -2197,7 +2164,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-left: auto;
       flex-shrink: 0;
     }
 
@@ -2206,15 +2172,7 @@
       border-color: var(--border-gold);
     }
 
-    .nav-search-btn .kbd-hint {
-      font-size: 0.6rem;
-      padding: 1px 5px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 3px;
-      font-family: monospace;
-      color: var(--text-muted);
-    }
+    .nav-search-btn .kbd-hint { display: none; }
 
     @media (max-width: 768px) {
       .nav-search-btn .kbd-hint { display: none; }
@@ -2374,42 +2332,39 @@
   <!-- NAVBAR -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <div class="nav-logo">⚖ Луриксбург <span class="nav-version" id="navVersionBadge" onclick="openChangelog()" title="История обновлений">v0.2.46</span></div>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#part1">Устав</a></li>
-        <li><a href="#part2">Билль о правах</a></li>
-        <li><a href="#part3">Кодекс штрафов</a></li>
-        <li><a href="#part4">Экономика</a></li>
-        <li><a href="#oath">Клятва</a></li>
-        <li><a href="#citizens">Жители</a></li>
-        <li><a href="#blacklist">ЧС</a></li>
-        <li><a href="#ratings">Оценки</a></li>
-      </ul>
-      <button class="nav-search-btn" onclick="openSearch()" title="Поиск (Ctrl+K)">
-        🔍 <span class="kbd-hint">Ctrl+K</span>
-      </button>
-      <!-- Header Auth Button -->
-      <button class="nav-auth-btn" id="navAuthBtn" onclick="handleNavAuthClick()">
-        <span class="auth-icon">👤</span>
-        <span class="auth-text">Войти</span>
-      </button>
-      <!-- Mayor-only: Role Manager -->
-      <button class="nav-auth-btn" id="mayorRoleBtn" onclick="openRoleManager()" style="display:none; background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,215,0,0.08)); border-color:rgba(255,215,0,0.4);">
-        <span>👑</span>
-        <span class="auth-text">Пользователи</span>
-      </button>
-      <button class="burger" id="burger" aria-label="Меню">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <div class="nav-logo">⚖ Луриксбург <span class="nav-version" id="navVersionBadge" onclick="openChangelog()" title="История обновлений">v0.2.48</span></div>
+
+      <!-- Page tabs in header -->
+      <div class="nav-pages-center">
+        <a href="#" class="nav-page-link active" data-page="laws" onclick="switchPage('laws',this);return false;" style="color:var(--text-secondary); text-decoration:none; font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:6px; transition:all 0.3s; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">📜 Законы</a>
+        <a href="#" class="nav-page-link" data-page="economy" onclick="switchPage('economy',this);return false;" style="color:var(--text-secondary); text-decoration:none; font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:6px; transition:all 0.3s; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">🏦 Экономика</a>
+        <a href="#" class="nav-page-link" data-page="community" onclick="switchPage('community',this);return false;" style="color:var(--text-secondary); text-decoration:none; font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:6px; transition:all 0.3s; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">🏘️ Сообщество</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="nav-search-btn" onclick="openSearch()" title="Поиск (Ctrl+K)">🔍</button>
+        <!-- Header Auth Button -->
+        <button class="nav-auth-btn" id="navAuthBtn" onclick="handleNavAuthClick()">
+          <span class="auth-text">Войти</span>
+        </button>
+        <!-- Mayor-only: Role Manager -->
+        <button class="nav-auth-btn" id="mayorRoleBtn" onclick="openRoleManager()" style="display:none; background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,215,0,0.08)); border-color:rgba(255,215,0,0.4);">
+          <span>👑</span>
+          <span class="auth-text">Пользователи</span>
+        </button>
+        <button class="burger" id="burger" aria-label="Меню">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
     </div>
   </nav>
 
   <!-- HERO -->
   <header class="hero" id="top">
     <div class="hero-emblem" style="font-size:4.5rem; color: var(--gold); text-shadow: 0 0 40px var(--glow-gold); filter: grayscale(1) brightness(1.5) sepia(1) hue-rotate(270deg);">⚖</div>
-    <h1 class="hero-title">Устав и Свод Законов<br>города Луриксбург</h1>
+    <h1 class="hero-title" id="heroMainTitle">Устав и Свод Законов<br>города Луриксбург</h1>
     <div class="hero-divider"></div>
     <p class="hero-subtitle">
       <em>«Мы, свободные жители великого города Луриксбург,<br>
@@ -2429,52 +2384,8 @@
   <!-- MAIN CONTENT -->
   <main class="content-wrapper">
 
-    <!-- TABLE OF CONTENTS -->
-    <div class="toc-card">
-      <div class="toc-title">📑 Содержание</div>
-      <div class="toc-grid">
-        <a href="#part1" class="toc-item">
-          <span class="toc-icon">🏰</span>
-          <span class="toc-num">I</span>
-          Устав города
-        </a>
-        <a href="#part2" class="toc-item">
-          <span class="toc-icon">⚖️</span>
-          <span class="toc-num">II</span>
-          Билль о правах
-        </a>
-        <a href="#part3" class="toc-item">
-          <span class="toc-icon">📋</span>
-          <span class="toc-num">III</span>
-          Кодекс штрафов
-        </a>
-        <a href="#part4" class="toc-item">
-          <span class="toc-icon">🏦</span>
-          <span class="toc-num">IV</span>
-          Экономический кодекс
-        </a>
-        <a href="#oath" class="toc-item">
-          <span class="toc-icon">📜</span>
-          <span class="toc-num">—</span>
-          Клятва верности
-        </a>
-        <a href="#citizens" class="toc-item">
-          <span class="toc-icon">🏘️</span>
-          <span class="toc-num">—</span>
-          Жители города
-        </a>
-        <a href="#blacklist" class="toc-item">
-          <span class="toc-icon">🚫</span>
-          <span class="toc-num">—</span>
-          Чёрный список
-        </a>
-        <a href="#ratings" class="toc-item">
-          <span class="toc-icon">⭐</span>
-          <span class="toc-num">—</span>
-          Оценки граждан
-        </a>
-      </div>
-    </div>
+    <!-- ===== PAGE: LAWS ===== -->
+    <div class="page-section" id="page-laws">
 
     <!-- ==================== ЧАСТЬ 1: КОНСТИТУЦИЯ ==================== -->
     <section class="section" id="part1">
@@ -2719,6 +2630,11 @@
       </div>
     </section>
 
+    </div><!-- /page-laws -->
+
+    <!-- ===== PAGE: ECONOMY ===== -->
+    <div class="page-section" id="page-economy" style="display:none;">
+
     <!-- ==================== ЧАСТЬ 4: ЭКОНОМИКА ==================== -->
     <section class="section" id="part4">
       <div class="section-header">
@@ -2810,6 +2726,11 @@
         <p style="color:var(--gold-dark); font-weight:600; letter-spacing:1px;">E PLURIBUS UNUM — ИЗ МНОГИХ — ЕДИНОЕ</p>
       </div>
     </section>
+
+    </div><!-- /page-economy -->
+
+    <!-- ===== PAGE: COMMUNITY ===== -->
+    <div class="page-section" id="page-community" style="display:none;">
 
     <!-- ==================== ЖИТЕЛИ ==================== -->
     <section class="section" id="citizens">
@@ -2906,6 +2827,8 @@
         <div id="reviewList"><div class="empty-note"><span class="loading-spinner"></span> Загрузка отзывов...</div></div>
       </div>
     </section>
+
+    </div><!-- /page-community -->
 
   </main>
 
@@ -3093,17 +3016,60 @@
 
     const ADMIN_NAMES = ['w00fla', 'Kustik589'];
 
+    /* ==================== PAGE SWITCHING ==================== */
+    function switchPage(pageName, linkEl) {
+      // Hide all pages
+      document.querySelectorAll('.page-section').forEach(function(p) {
+        p.style.display = 'none';
+      });
+      // Show selected page
+      var target = document.getElementById('page-' + pageName);
+      if (target) target.style.display = 'block';
+
+      // Update active link
+      document.querySelectorAll('.nav-page-link').forEach(function(a) {
+        a.classList.remove('active');
+      });
+      if (linkEl) linkEl.classList.add('active');
+
+      // Update hero title + browser title for current tab
+      var heroTitle = document.getElementById('heroMainTitle');
+      var pageTitles = {
+        laws: 'Устав и Свод Законов<br>города Луриксбург',
+        economy: 'Экономика<br>города Луриксбург',
+        community: 'Жители, Чёрный список и Оценки<br>города Луриксбург'
+      };
+      var browserTitles = {
+        laws: 'Устав города Луриксбург',
+        economy: 'Экономика города Луриксбург',
+        community: 'Сообщество города Луриксбург'
+      };
+      if (heroTitle && pageTitles[pageName]) heroTitle.innerHTML = pageTitles[pageName];
+      if (browserTitles[pageName]) document.title = browserTitles[pageName];
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     /* ==================== CHANGELOG ==================== */
     var SITE_CHANGELOG = [
+      {
+        version: 'v0.2.48',
+        date: '10 авг. 2026',
+        items: [
+          'Навигация по вкладкам: Законы / Экономика / Сообщество',
+          'Каждая вкладка показывает свой набор секций',
+          'Favicon сайта — ⚖ на фиолетовом фоне'
+        ]
+      },
       {
         version: 'v0.2.46',
         date: '10 авг. 2026',
         items: [
-          'История обновлений переведена на единый JS-список, чтобы версия и модалка не расходились',
-          'Добавлен кастомный декоративный тег для пользователей без выдачи дополнительных прав',
-          'Смена роли прямо по клику на бейдж роли в списке пользователей',
-          'Роль «Зам» получила права Мэра',
-          'Админы видят список зарегистрированных пользователей без права назначать роли'
+          'История обновлений переведена на единый JS-список',
+          'Кастомные декоративные теги для пользователей',
+          'Смена роли по клику на бейдж в списке пользователей',
+          'Роль «Зам» с правами Мэра'
         ]
       },
       {
@@ -3494,9 +3460,7 @@
           '<span class="auth-text">' + esc(name) + '</span>';
       } else {
         btn.className = 'nav-auth-btn';
-        btn.innerHTML = 
-          '<span class="auth-icon">👤</span>' +
-          '<span class="auth-text">Войти</span>';
+        btn.innerHTML = '<span class="auth-text">Войти</span>';
       }
     }
 
