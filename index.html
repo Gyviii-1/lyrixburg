@@ -56,13 +56,6 @@
         <a href="#" class="nav-page-link" data-page="community" onclick="switchPage('community',this);return false;" style="color:var(--text-secondary); text-decoration:none; font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:6px; transition:all 0.3s; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">🏘️ Сообщество</a>
       </div>
 
-      <!-- Slide-out drawer (mobile) -->
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#" class="nav-page-link active" data-page="laws" onclick="switchPage('laws',this);return false;">📜 Законы</a></li>
-        <li><a href="#" class="nav-page-link" data-page="economy" onclick="switchPage('economy',this);return false;">🏦 Экономика</a></li>
-        <li><a href="#" class="nav-page-link" data-page="community" onclick="switchPage('community',this);return false;">🏘️ Сообщество</a></li>
-      </ul>
-
       <div class="nav-actions">
         <button class="nav-search-btn" onclick="openSearch()" title="Поиск (Ctrl+K)">🔍</button>
         <!-- Header Auth Button -->
@@ -83,6 +76,13 @@
       </div>
     </div>
   </nav>
+
+  <!-- Slide-out drawer (mobile) — must be OUTSIDE the navbar so it stacks above the overlay -->
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" class="nav-page-link active" data-page="laws" onclick="switchPage('laws',this);return false;">📜 Законы</a></li>
+    <li><a href="#" class="nav-page-link" data-page="economy" onclick="switchPage('economy',this);return false;">🏦 Экономика</a></li>
+    <li><a href="#" class="nav-page-link" data-page="community" onclick="switchPage('community',this);return false;">🏘️ Сообщество</a></li>
+  </ul>
 
   <!-- HERO -->
   <header class="hero" id="top">
