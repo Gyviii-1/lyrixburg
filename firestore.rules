@@ -19,13 +19,22 @@ service cloud.firestore {
     // Оценки
     match /ratings/{ratingId} {
       allow read: if true;
-      allow create: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.oderId == request.auth.uid
+        && !request.resource.data.keys().hasAny(['adminReply', 'adminReplyBy', 'adminReplyAt']);
       allow update, delete: if request.auth != null && (
         (resource.data.oderId == request.auth.uid
           && !request.resource.data.diff(resource.data).affectedKeys()
             .hasAny(['adminReply', 'adminReplyBy', 'adminReplyAt']))
         || isStaff()
       );
+    }
+
+    // Журнал действий
+    match /logs/{logId} {
+      allow create: if request.auth != null;
+      allow read: if isStaff();
+      allow update, delete: if false;
     }
 
     // Жители

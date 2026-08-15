@@ -1809,6 +1809,18 @@
 
     .field { margin-bottom: 14px; }
 
+    /* Honeypot: скрытая ловушка для ботов */
+    .honeypot {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
     .field label {
       display: block;
       font-size: 0.7rem;

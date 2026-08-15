@@ -571,6 +571,12 @@
         <input type="password" id="inpPass" placeholder="Минимум 6 символов" autocomplete="current-password" maxlength="40">
       </div>
 
+      <!-- Honeypot: невидимое поле-ловушка для ботов (люди его не видят и не заполняют) -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="hpField">Не заполняйте это поле</label>
+        <input type="text" id="hpField" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
       <div class="modal-error" id="authError"></div>
 
       <button class="btn-gold" style="width:100%; padding:14px;" id="authSubmit">Зарегистрироваться</button>

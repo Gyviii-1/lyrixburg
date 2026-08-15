@@ -248,6 +248,8 @@
     let ratingsData = [];
     let unsubscribeRatings = null;
     let fbConnected = false;
+    let lastAuthAttempt = 0;
+    let lastRatingSubmit = 0;
 
     /* ==================== AUTH STATE LISTENER ==================== */
     auth.onAuthStateChanged(function(user) {
@@ -417,6 +419,23 @@
       var btn = document.getElementById('authSubmit');
 
       errEl.textContent = '';
+
+      // Honeypot-ловушка: боты заполняют скрытое поле — молча отбрасываем
+      var hp = document.getElementById('hpField');
+      if (hp && hp.value.trim() !== '') {
+        writeLog('bot_blocked', 'Honeypot: ' + hp.value.trim().substring(0, 100));
+        closeAuth();
+        showToast('🎉 Готово!');
+        return;
+      }
+
+      // Защита от частых попыток (брутфорс/спам)
+      var now = Date.now();
+      if (now - lastAuthAttempt < 4000) {
+        errEl.textContent = '⏳ Слишком часто — подождите пару секунд';
+        return;
+      }
+      lastAuthAttempt = now;
 
       if (login.length < 3) { errEl.textContent = 'Ник должен быть не короче 3 символов'; return; }
       if (!/^[A-Za-z0-9_]+$/.test(login)) { errEl.textContent = 'Ник: только латиница, цифры и _'; return; }
@@ -1229,6 +1248,14 @@
       if (!db) { showToast('❌ База данных недоступна', true); return; }
       if (isBlacklisted(getDisplayName())) { showToast('🚫 Вы в чёрном списке', true); return; }
       if (!pickedStars) { showToast('⚠️ Сначала выберите количество звёзд', true); return; }
+
+      // Защита от спама: минимум 10 секунд между отправками
+      var now = Date.now();
+      if (now - lastRatingSubmit < 10000) {
+        showToast('⏳ Слишком часто — подождите 10 секунд', true);
+        return;
+      }
+      lastRatingSubmit = now;
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
