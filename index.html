@@ -230,23 +230,41 @@
     }
 
     @media (max-width: 768px) {
+      .nav-container {
+        padding: 0 10px;
+        gap: 4px;
+      }
+      .nav-version { display: none; }
       .nav-pages-center {
         position: static;
         transform: none;
         margin: 0 auto;
         gap: 2px;
+        min-width: 0;
       }
       .nav-pages-center .nav-page-link {
-        font-size: 0.66rem !important;
-        padding: 6px 8px !important;
+        font-size: 0.64rem !important;
+        padding: 6px 6px !important;
+        letter-spacing: 0.2px !important;
       }
       .nav-auth-btn {
-        padding: 6px 12px;
+        padding: 6px 10px;
         font-size: 0.75rem;
-        margin-left: 8px;
+        margin-left: 6px;
       }
       .nav-auth-btn .auth-text { display: none; }
       .nav-auth-btn .auth-icon { font-size: 1.1rem; }
+      .nav-search-btn { padding: 6px 8px; }
+    }
+
+    @media (max-width: 480px) {
+      .nav-logo { font-size: 0.7rem; letter-spacing: 1px; }
+      .nav-pages-center .nav-page-link {
+        font-size: 0.58rem !important;
+        padding: 6px 4px !important;
+      }
+      .nav-auth-btn { padding: 6px 8px; }
+      .nav-search-btn { padding: 6px 6px; }
     }
 
     /* ===== REVIEW VOTES (Reddit-style) ===== */
@@ -617,6 +635,33 @@
       color: var(--text-muted);
       padding: 30px;
       font-style: italic;
+    }
+
+    /* ===== PAGE TRANSITIONS ===== */
+    .page-section {
+      animation: pageIn 0.5s ease forwards;
+    }
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .page-section.page-out {
+      animation: pageOut 0.25s ease forwards;
+    }
+    @keyframes pageOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-15px); }
+    }
+
+    /* Hero title animation */
+    .hero-title.title-swap {
+      animation: titleSwap 0.6s ease forwards;
+    }
+    @keyframes titleSwap {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      40% { opacity: 0; transform: translateY(-20px) scale(0.97); }
+      60% { opacity: 0; transform: translateY(20px) scale(0.97); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     /* ===== PAGE NAVIGATION ===== */
@@ -3017,23 +3062,15 @@
     const ADMIN_NAMES = ['w00fla', 'Kustik589'];
 
     /* ==================== PAGE SWITCHING ==================== */
+    var currentPage = 'laws';
+
     function switchPage(pageName, linkEl) {
-      // Hide all pages
-      document.querySelectorAll('.page-section').forEach(function(p) {
-        p.style.display = 'none';
-      });
-      // Show selected page
-      var target = document.getElementById('page-' + pageName);
-      if (target) target.style.display = 'block';
+      if (pageName === currentPage) return;
 
-      // Update active link
-      document.querySelectorAll('.nav-page-link').forEach(function(a) {
-        a.classList.remove('active');
-      });
-      if (linkEl) linkEl.classList.add('active');
-
-      // Update hero title + browser title for current tab
+      var oldPage = document.getElementById('page-' + currentPage);
+      var newPage = document.getElementById('page-' + pageName);
       var heroTitle = document.getElementById('heroMainTitle');
+
       var pageTitles = {
         laws: 'Устав и Свод Законов<br>города Луриксбург',
         economy: 'Экономика<br>города Луриксбург',
@@ -3044,8 +3081,48 @@
         economy: 'Экономика города Луриксбург',
         community: 'Сообщество города Луриксбург'
       };
-      if (heroTitle && pageTitles[pageName]) heroTitle.innerHTML = pageTitles[pageName];
+
+      // Update active link
+      document.querySelectorAll('.nav-page-link').forEach(function(a) {
+        a.classList.remove('active');
+      });
+      if (linkEl) linkEl.classList.add('active');
+
+      // Animate hero title
+      if (heroTitle) {
+        heroTitle.classList.remove('title-swap');
+        void heroTitle.offsetWidth;
+        heroTitle.classList.add('title-swap');
+        setTimeout(function() {
+          heroTitle.innerHTML = pageTitles[pageName] || pageTitles.laws;
+        }, 240);
+      }
+
+      // Browser title
       if (browserTitles[pageName]) document.title = browserTitles[pageName];
+
+      // Animate old page out, then new page in
+      if (oldPage) {
+        oldPage.classList.remove('page-out');
+        void oldPage.offsetWidth;
+        oldPage.classList.add('page-out');
+      }
+
+      setTimeout(function() {
+        // Hide all
+        document.querySelectorAll('.page-section').forEach(function(p) {
+          p.style.display = 'none';
+          p.classList.remove('page-out');
+        });
+        // Show new
+        if (newPage) {
+          newPage.style.display = 'block';
+          newPage.style.animation = 'none';
+          void newPage.offsetWidth;
+          newPage.style.animation = '';
+        }
+        currentPage = pageName;
+      }, 250);
 
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
