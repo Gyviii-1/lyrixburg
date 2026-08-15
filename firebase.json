@@ -1,0 +1,6 @@
+{
+  "project": "luriksburg-constitution",
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

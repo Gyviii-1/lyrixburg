@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isStaff() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        in ['admin', 'sheriff', 'deputy'];
+    }
+
+    // Пользователи
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.role == 'user';
+      allow update, delete: if isStaff();
+    }
+
+    // Оценки
+    match /ratings/{ratingId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && (
+        (resource.data.oderId == request.auth.uid
+          && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['adminReply', 'adminReplyBy', 'adminReplyAt']))
+        || isStaff()
+      );
+    }
+
+    // Жители
+    match /citizens/{docId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Чёрный список
+    match /blacklist/{docId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Тикеты
+    match /tickets/{ticketId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && (resource.data.userId == request.auth.uid || isStaff());
+    }
+  }
+}
