@@ -737,7 +737,10 @@
           return '<div class="reg-user-row">' +
             '<div class="reg-user-avatar-sm">' + esc(ini) + '</div>' +
             '<div class="reg-user-main">' +
-              '<div class="reg-user-name">' + esc(u.name) + '</div>' +
+              '<div class="reg-user-name-row">' +
+                '<div class="reg-user-name">' + esc(u.name) + '</div>' +
+                '<button class="copy-btn" onclick="copyNick(\'' + esc(u.name) + '\', event)" title="Копировать ник">📋</button>' +
+              '</div>' +
               '<div class="reg-user-sub">' + customBadge + '</div>' +
             '</div>' +
             roleCtrl +
@@ -994,7 +997,8 @@
         var ini = c.name.substring(0, 2).toUpperCase();
         return '<div class="citizen-card">' +
           '<div class="citizen-avatar">' + esc(ini) + '</div>' +
-          '<div><div class="citizen-name">' + esc(c.name) + '</div>' +
+          '<div><div class="citizen-name-row"><div class="citizen-name">' + esc(c.name) + '</div>' +
+          '<button class="copy-btn" onclick="copyNick(\'' + esc(c.name) + '\', event)" title="Копировать ник">📋</button></div>' +
           '<div class="citizen-role">' + (postMap[c.post] || '🛡️ Житель') + '</div></div>' +
           (adm ? '<button class="citizen-remove" onclick="removeCitizen(\'' + c.id + '\',\'' + esc(c.name) + '\')" title="Удалить">✕</button>' : '') +
           '</div>';
@@ -1081,7 +1085,8 @@
         var ini = b.name.substring(0, 2).toUpperCase();
         return '<div class="blacklist-card">' +
           '<div class="blacklist-avatar">' + esc(ini) + '</div>' +
-          '<div><div class="blacklist-name">' + esc(b.name) + '</div>' +
+          '<div><div class="blacklist-name-row"><div class="blacklist-name">' + esc(b.name) + '</div>' +
+          '<button class="copy-btn" onclick="copyNick(\'' + esc(b.name) + '\', event)" title="Копировать ник">📋</button></div>' +
           (b.reason ? '<div class="blacklist-reason">Причина: ' + esc(b.reason) + '</div>' : '<div class="blacklist-reason">Без указания причины</div>') +
           '</div>' +
           (adm ? '<button class="citizen-remove" onclick="removeFromBlacklist(\'' + b.id + '\',\'' + esc(b.name) + '\')" title="Убрать из ЧС">✕</button>' : '') +
@@ -1604,6 +1609,26 @@
       const d = document.createElement('div');
       d.textContent = String(s);
       return d.innerHTML;
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (err) {}
+      document.body.removeChild(ta);
+    }
+    function copyNick(nick, e) {
+      if (e) e.stopPropagation();
+      var done = function() { showToast('📋 Ник скопирован: ' + nick); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(nick).then(done, function() { fallbackCopy(nick); done(); });
+      } else {
+        fallbackCopy(nick);
+        done();
+      }
     }
     function fmtDate(d) {
       return d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' }) +
