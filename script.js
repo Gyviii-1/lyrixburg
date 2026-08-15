@@ -495,7 +495,7 @@
           '<span class="auth-text">' + esc(name) + '</span>';
       } else {
         btn.className = 'nav-auth-btn';
-        btn.innerHTML = '<span class="auth-text">Войти</span>';
+        btn.innerHTML = '<span class="auth-icon">👤</span><span class="auth-text">Войти</span>';
       }
     }
 
