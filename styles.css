@@ -2523,8 +2523,10 @@
       -ms-user-select: none;
       user-select: none;
     }
-    /* Allow selection in input fields */
-    input, textarea, .review-text, .oath-text {
+    /* Allow selection in input fields and nicknames */
+    input, textarea, .review-text, .oath-text,
+    .reg-user-name, .citizen-name, .blacklist-name,
+    .reg-user-sub, .citizen-role, .blacklist-reason {
       -webkit-user-select: text;
       -moz-user-select: text;
       -ms-user-select: text;
