@@ -627,12 +627,6 @@
       flex: 1;
       min-width: 0;
     }
-    .reg-user-name-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-    }
     .reg-user-name { color: var(--text-primary); font-weight: 600; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .reg-user-sub {
       font-size: 0.68rem;
@@ -736,26 +730,6 @@
       font-size: 0.7rem;
       color: var(--text-muted);
     }
-    .copy-btn {
-      width: 22px;
-      height: 22px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      cursor: pointer;
-      opacity: 0.55;
-      transition: all 0.2s;
-      padding: 0;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-    .copy-btn:hover { opacity: 1; color: var(--gold); }
-    .citizen-name-row, .blacklist-name-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
-    .citizen-name, .blacklist-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .citizen-remove {
       margin-left: auto;
       background: none;
