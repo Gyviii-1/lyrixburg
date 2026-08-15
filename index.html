@@ -635,37 +635,27 @@
     </div>
   </div>
 
-  <!-- ===== ROLE MANAGER MODAL (only w00fla) ===== -->
+  <!-- ===== ROLE MANAGER MODAL (staff only) ===== -->
   <div class="modal" id="roleModal">
-    <div class="modal-box" style="max-width: 520px;">
+    <div class="modal-box role-modal-box">
       <button class="modal-close" onclick="closeRoleManager()">×</button>
       <div class="modal-title" id="roleModalTitle">👑 Управление ролями</div>
-      <div class="modal-sub" id="roleModalSub">Назначение ролей — для Мэра и Зама</div>
+      <div class="modal-sub" id="roleModalSub">Смена ролей, теги и блокировка — прямо из списка</div>
 
-      <div id="roleAssignWrap">
-        <div class="field">
-          <label for="roleNick">Игровой ник</label>
-          <input type="text" id="roleNick" placeholder="Введите ник игрока" maxlength="20">
-        </div>
-        <div class="field">
-          <label for="roleSelect">Роль</label>
-          <select id="roleSelect" style="width:100%; padding:12px 14px; background:rgba(0,0,0,0.4); border:1px solid rgba(212,175,55,0.18); border-radius:10px; color:var(--text-primary); font-family:'Inter',sans-serif; font-size:0.92rem; outline:none;">
-            <option value="user">Пользователь</option>
-            <option value="deputy">Зам</option>
-            <option value="sheriff">Шериф</option>
-            <option value="admin">Администратор</option>
-          </select>
-        </div>
+      <!-- Stats -->
+      <div class="role-stats" id="roleStats"></div>
 
-        <div class="modal-error" id="roleError"></div>
-        <div class="modal-success" id="roleSuccess" style="color:#81C784; font-size:0.85rem; text-align:center; min-height:20px; margin-bottom:8px;"></div>
+      <!-- Search -->
+      <input type="text" id="roleSearch" class="role-search" placeholder="🔍 Поиск по нику..." oninput="filterRoleUsers()" maxlength="30">
 
-        <button class="btn-gold" style="width:100%; padding:14px;" onclick="assignRole()">
-          👑 Назначить роль
-        </button>
+      <!-- Users list -->
+      <div class="reg-users-scroll" id="regUsersList">
+        <div class="citizens-empty"><span class="loading-spinner"></span> Загрузка...</div>
+      </div>
 
-        <!-- Custom Tag Section -->
-        <div style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 20px; padding-top: 20px;">
+      <!-- Custom tag section (показывается при нажатии ✏️ у игрока) -->
+      <div id="roleAssignWrap" style="display:none;">
+        <div style="border-top: 1px solid rgba(212,175,55,0.15); margin-top: 20px; padding-top: 20px;">
           <div style="color:var(--gold); font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom: 12px;">🏷️ Кастомный тег</div>
           <div class="field">
             <label for="tagNick">Ник игрока</label>
@@ -694,16 +684,6 @@
           </div>
           <div class="modal-error" id="tagError" style="margin-top:8px;"></div>
           <div class="modal-success" id="tagSuccess" style="color:#81C784; font-size:0.85rem; text-align:center; min-height:18px; margin-top:6px;"></div>
-        </div>
-      </div>
-
-      <!-- Registered users list -->
-      <div style="border-top: 1px solid rgba(212,175,55,0.15); margin-top: 24px; padding-top: 20px;">
-        <div style="color:var(--gold); font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom: 12px;">
-          📋 Все зарегистрированные пользователи
-        </div>
-        <div class="reg-users-scroll" id="regUsersList">
-          <div class="citizens-empty"><span class="loading-spinner"></span> Загрузка...</div>
         </div>
       </div>
     </div>

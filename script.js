@@ -622,28 +622,21 @@
     function openRoleManager() {
       if (!isStaff()) { showToast('⛔ Только для администрации', true); return; }
 
-      var assignWrap = document.getElementById('roleAssignWrap');
       var titleEl = document.getElementById('roleModalTitle');
       var subEl = document.getElementById('roleModalSub');
+      var searchEl = document.getElementById('roleSearch');
 
       if (hasMayorRights()) {
-        assignWrap.style.display = 'block';
         titleEl.textContent = '👑 Управление ролями';
-        subEl.textContent = 'Назначение ролей и список пользователей';
-        document.getElementById('roleNick').value = '';
-        document.getElementById('roleError').textContent = '';
-        document.getElementById('roleSuccess').textContent = '';
+        subEl.textContent = 'Смена ролей, теги и блокировка — прямо из списка';
       } else {
-        assignWrap.style.display = 'none';
         titleEl.textContent = '📋 Зарегистрированные пользователи';
         subEl.textContent = 'Просмотр списка зарегистрированных пользователей';
       }
+      if (searchEl) searchEl.value = '';
 
       document.getElementById('roleModal').classList.add('open');
       loadRegisteredUsers();
-      setTimeout(function() {
-        if (hasMayorRights()) document.getElementById('roleNick').focus();
-      }, 100);
     }
 
     function closeRoleManager() {
@@ -654,20 +647,18 @@
       if (e.target.id === 'roleModal') closeRoleManager();
     });
 
+    var roleUsersCache = [];
+
     function loadRegisteredUsers() {
       var el = document.getElementById('regUsersList');
       el.innerHTML = '<div class="citizens-empty"><span class="loading-spinner"></span> Загрузка...</div>';
 
       db.collection('users').get()
         .then(function(snap) {
-          if (snap.empty) {
-            el.innerHTML = '<div class="citizens-empty">Нет зарегистрированных пользователей</div>';
-            return;
-          }
-          var users = [];
+          roleUsersCache = [];
           snap.forEach(function(d) {
             var data = d.data();
-            users.push({
+            roleUsersCache.push({
               uid: d.id,
               name: data.username || data.displayName || '—',
               role: data.role || 'user',
@@ -677,46 +668,13 @@
             });
           });
           // Мэр первым, потом зам, потом админы, потом шерифы, потом обычные, потом заблокированные
-          users.sort(function(a, b) {
+          roleUsersCache.sort(function(a, b) {
             var order = { mayor: 0, deputy: 1, admin: 2, sheriff: 3, user: 4, deleted: 5 };
             var oa = a.name.toLowerCase() === 'w00fla' ? 0 : (order[a.role] !== undefined ? order[a.role] : 4);
             var ob = b.name.toLowerCase() === 'w00fla' ? 0 : (order[b.role] !== undefined ? order[b.role] : 4);
             return oa - ob || a.name.localeCompare(b.name);
           });
-
-          el.innerHTML = users.map(function(u) {
-            var ini = u.name.substring(0, 2).toUpperCase();
-            var isMyr = u.name.toLowerCase() === 'w00fla';
-            var isBlocked = u.role === 'deleted';
-            var tagClass = isMyr ? 'reg-tag-mayor' : (isBlocked ? 'reg-tag-deleted' : (u.role === 'deputy' ? 'reg-tag-deputy' : (u.role === 'admin' ? 'reg-tag-admin' : (u.role === 'sheriff' ? 'reg-tag-sheriff' : 'reg-tag-user'))));
-            var tagText = isMyr ? '👑 Мэр' : (isBlocked ? '🚫 Заблокирован' : (u.role === 'deputy' ? '⭐ Зам' : (u.role === 'admin' ? '⚔ Админ' : (u.role === 'sheriff' ? '🔰 Шериф' : 'Пользователь'))));
-            var actionBtn = '';
-            if (!isMyr && isBlocked) {
-              actionBtn = '<button class="citizen-remove" onclick="unblockUserAccount(\'' + u.uid + '\',\'' + esc(u.name) + '\',\'' + esc(u.previousRole) + '\')" title="Разблокировать">✅</button>';
-              if (hasMayorRights()) {
-                actionBtn += '<button class="citizen-remove" onclick="purgeUserDoc(\'' + u.uid + '\',\'' + esc(u.name) + '\')" title="Удалить из базы полностью">🗑️</button>';
-              }
-            } else if (!isMyr) {
-              actionBtn = '<button class="citizen-remove" onclick="blockUserAccount(\'' + u.uid + '\',\'' + esc(u.name) + '\',\'' + esc(u.role) + '\')" title="Заблокировать">🚫</button>';
-              if (hasMayorRights()) {
-                actionBtn += '<button class="citizen-remove" onclick="purgeUserDoc(\'' + u.uid + '\',\'' + esc(u.name) + '\')" title="Удалить из базы полностью">🗑️</button>';
-              }
-            }
-            // Кликабельный тег роли (только для Мэра/Зама, и не для самого Мэра w00fla, и не для заблокированных)
-            var roleTag = '';
-            if (hasMayorRights() && !isMyr && !isBlocked) {
-              roleTag = '<span class="reg-user-role-tag clickable ' + tagClass + '" onclick="showRoleSelect(this,\'' + u.uid + '\',\'' + esc(u.name) + '\',\'' + u.role + '\')" title="Нажмите чтобы сменить роль">' + tagText + '</span>';
-            } else {
-              roleTag = '<span class="reg-user-role-tag ' + tagClass + '">' + tagText + '</span>';
-            }
-            var customBadge = u.customTag ? '<span class="role-badge badge-custom" style="background:' + u.customTagColor + '20; border:1px solid ' + u.customTagColor + '55; color:' + u.customTagColor + ';">' + esc(u.customTag) + '</span>' : '';
-            return '<div class="reg-user-row">' +
-              '<div class="reg-user-avatar-sm">' + esc(ini) + '</div>' +
-              '<span class="reg-user-name">' + esc(u.name) + '</span>' +
-              roleTag + customBadge +
-              actionBtn +
-              '</div>';
-          }).join('');
+          renderRoleUsers();
         })
         .catch(function(e) {
           console.error('[Load Users Error]', e);
@@ -724,45 +682,114 @@
         });
     }
 
-    function showRoleSelect(el, uid, name, currentRole) {
-      // Заменяем тег на select прямо в строке
-      var roles = [
-        { val: 'user', txt: 'Пользователь' },
-        { val: 'deputy', txt: '⭐ Зам' },
-        { val: 'sheriff', txt: '🔰 Шериф' },
-        { val: 'admin', txt: '⚔ Админ' }
-      ];
-      var sel = document.createElement('select');
-      sel.className = 'inline-role-select';
-      roles.forEach(function(r) {
-        var opt = document.createElement('option');
-        opt.value = r.val;
-        opt.textContent = r.txt;
-        if (r.val === currentRole) opt.selected = true;
-        sel.appendChild(opt);
-      });
-      el.replaceWith(sel);
-      sel.focus();
+    function filterRoleUsers() {
+      renderRoleUsers();
+    }
 
-      sel.addEventListener('change', function() {
-        var newRole = sel.value;
-        db.collection('users').doc(uid).update({ role: newRole })
-          .then(function() {
-            var roleNames = { admin: 'Администратор', sheriff: 'Шериф', deputy: 'Зам', user: 'Пользователь' };
-            showToast('👑 ' + name + ' → ' + (roleNames[newRole] || newRole));
-            writeLog('assign_role', name + ' → ' + (roleNames[newRole] || newRole));
-            loadRegisteredUsers();
-          })
-          .catch(function(e) {
-            showToast('❌ Ошибка: ' + (e.message || e.code), true);
-            loadRegisteredUsers();
-          });
-      });
+    function renderRoleUsers() {
+      var el = document.getElementById('regUsersList');
+      var statsEl = document.getElementById('roleStats');
+      var searchEl = document.getElementById('roleSearch');
+      var q = (searchEl ? searchEl.value : '').trim().toLowerCase();
+      var filtered = q
+        ? roleUsersCache.filter(function(u) { return u.name.toLowerCase().indexOf(q) !== -1; })
+        : roleUsersCache;
 
-      // Если кликнул мимо — вернуть обратно
-      sel.addEventListener('blur', function() {
-        loadRegisteredUsers();
-      });
+      if (!roleUsersCache.length) {
+        el.innerHTML = '<div class="citizens-empty">Нет зарегистрированных пользователей</div>';
+      } else if (!filtered.length) {
+        el.innerHTML = '<div class="citizens-empty">Никого не найдено</div>';
+      } else {
+        el.innerHTML = filtered.map(function(u) {
+          var ini = u.name.substring(0, 2).toUpperCase();
+          var isMyr = u.name.toLowerCase() === 'w00fla';
+          var isBlocked = u.role === 'deleted';
+          var editable = hasMayorRights() && !isMyr && !isBlocked;
+          var tagClass = isMyr ? 'reg-tag-mayor' : (isBlocked ? 'reg-tag-deleted' : (u.role === 'deputy' ? 'reg-tag-deputy' : (u.role === 'admin' ? 'reg-tag-admin' : (u.role === 'sheriff' ? 'reg-tag-sheriff' : 'reg-tag-user'))));
+          var tagText = isMyr ? '👑 Мэр' : (isBlocked ? '🚫 Заблокирован' : (u.role === 'deputy' ? '⭐ Зам' : (u.role === 'admin' ? '⚔ Админ' : (u.role === 'sheriff' ? '🔰 Шериф' : 'Пользователь'))));
+
+          var roleCtrl = '';
+          if (editable) {
+            roleCtrl = '<select class="inline-role-select" onchange="changeRole(this,\'' + u.uid + '\',\'' + esc(u.name) + '\')">' +
+              '<option value="user"' + (u.role === 'user' ? ' selected' : '') + '>Пользователь</option>' +
+              '<option value="deputy"' + (u.role === 'deputy' ? ' selected' : '') + '>⭐ Зам</option>' +
+              '<option value="sheriff"' + (u.role === 'sheriff' ? ' selected' : '') + '>🔰 Шериф</option>' +
+              '<option value="admin"' + (u.role === 'admin' ? ' selected' : '') + '>⚔ Админ</option>' +
+              '</select>';
+          } else {
+            roleCtrl = '<span class="reg-user-role-tag ' + tagClass + '">' + tagText + '</span>';
+          }
+
+          var actions = '';
+          if (hasMayorRights() && !isMyr) {
+            if (isBlocked) {
+              actions += '<button class="reg-action" onclick="unblockUserAccount(\'' + u.uid + '\',\'' + esc(u.name) + '\',\'' + esc(u.previousRole) + '\')" title="Разблокировать">✅</button>';
+              actions += '<button class="reg-action danger" onclick="purgeUserDoc(\'' + u.uid + '\',\'' + esc(u.name) + '\')" title="Удалить из базы полностью">🗑️</button>';
+            } else {
+              actions += '<button class="reg-action" onclick="openTagEditor(\'' + esc(u.name) + '\')" title="Назначить кастомный тег">✏️</button>';
+              actions += '<button class="reg-action danger" onclick="blockUserAccount(\'' + u.uid + '\',\'' + esc(u.name) + '\',\'' + esc(u.role) + '\')" title="Заблокировать">🚫</button>';
+              actions += '<button class="reg-action danger" onclick="purgeUserDoc(\'' + u.uid + '\',\'' + esc(u.name) + '\')" title="Удалить из базы полностью">🗑️</button>';
+            }
+          }
+
+          var customBadge = u.customTag ? '<span class="role-badge badge-custom" style="background:' + u.customTagColor + '20; border:1px solid ' + u.customTagColor + '55; color:' + u.customTagColor + ';">' + esc(u.customTag) + '</span>' : '';
+
+          return '<div class="reg-user-row">' +
+            '<div class="reg-user-avatar-sm">' + esc(ini) + '</div>' +
+            '<div class="reg-user-main">' +
+              '<div class="reg-user-name">' + esc(u.name) + '</div>' +
+              '<div class="reg-user-sub">' + customBadge + '</div>' +
+            '</div>' +
+            roleCtrl +
+            actions +
+            '</div>';
+        }).join('');
+      }
+
+      if (statsEl) {
+        var c = { mayor: 0, deputy: 0, admin: 0, sheriff: 0, user: 0, deleted: 0 };
+        roleUsersCache.forEach(function(u) {
+          var r = u.name.toLowerCase() === 'w00fla' ? 'mayor' : (c[u.role] !== undefined ? u.role : 'user');
+          c[r]++;
+        });
+        statsEl.innerHTML =
+          '<span class="role-stat">👥 ' + roleUsersCache.length + '</span>' +
+          '<span class="role-stat stat-mayor">👑 ' + c.mayor + '</span>' +
+          '<span class="role-stat stat-deputy">⭐ ' + c.deputy + '</span>' +
+          '<span class="role-stat stat-admin">⚔ ' + c.admin + '</span>' +
+          '<span class="role-stat stat-sheriff">🔰 ' + c.sheriff + '</span>' +
+          '<span class="role-stat stat-user">👤 ' + c.user + '</span>' +
+          '<span class="role-stat stat-deleted">🚫 ' + c.deleted + '</span>';
+      }
+    }
+
+    function changeRole(sel, uid, name) {
+      var newRole = sel.value;
+      db.collection('users').doc(uid).update({ role: newRole })
+        .then(function() {
+          var roleNames = { admin: 'Администратор', sheriff: 'Шериф', deputy: 'Зам', user: 'Пользователь' };
+          showToast('👑 ' + name + ' → ' + (roleNames[newRole] || newRole));
+          writeLog('assign_role', name + ' → ' + (roleNames[newRole] || newRole));
+          loadRegisteredUsers();
+        })
+        .catch(function(e) {
+          showToast('❌ Ошибка: ' + (e.message || e.code), true);
+          loadRegisteredUsers();
+        });
+    }
+
+    function openTagEditor(name) {
+      if (!hasMayorRights()) { showToast('⛔ Только для Мэра и Зама', true); return; }
+      document.getElementById('tagNick').value = name;
+      document.getElementById('tagText').value = '';
+      document.getElementById('tagError').textContent = '';
+      document.getElementById('tagSuccess').textContent = '';
+      var wrap = document.getElementById('roleAssignWrap');
+      if (wrap) {
+        wrap.style.display = 'block';
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      setTimeout(function() { document.getElementById('tagText').focus(); }, 150);
     }
 
     // ===== CUSTOM TAGS =====
@@ -826,40 +853,6 @@
           });
         })
         .catch(function(e) { errEl.textContent = 'Ошибка: ' + (e.message || e.code); });
-    }
-
-    function assignRole() {
-      if (!hasMayorRights()) { showToast('⛔ Только для Мэра и Зама', true); return; }
-      var nick = document.getElementById('roleNick').value.trim();
-      var role = document.getElementById('roleSelect').value;
-      var errEl = document.getElementById('roleError');
-      var successEl = document.getElementById('roleSuccess');
-      errEl.textContent = '';
-      successEl.textContent = '';
-
-      if (nick.length < 2) { errEl.textContent = 'Введите ник игрока'; return; }
-
-      // Find user in Firestore by username
-      db.collection('users').where('username', '==', nick).get()
-        .then(function(snap) {
-          if (snap.empty) {
-            errEl.textContent = 'Игрок «' + nick + '» не найден в базе';
-            return;
-          }
-          var userDoc = snap.docs[0];
-          return db.collection('users').doc(userDoc.id).update({ role: role })
-            .then(function() {
-              var roleNames = { admin: 'Администратор', sheriff: 'Шериф', deputy: 'Зам', user: 'Пользователь' };
-              successEl.textContent = '✅ ' + nick + ' → роль «' + (roleNames[role] || role) + '» назначена!';
-              showToast('👑 Роль обновлена для ' + nick);
-              writeLog('assign_role', nick + ' → ' + (roleNames[role] || role));
-              loadRegisteredUsers();
-            });
-        })
-        .catch(function(e) {
-          console.error('[Role Assign Error]', e);
-          errEl.textContent = 'Ошибка: ' + (e.message || e.code);
-        });
     }
 
     function blockUserAccount(uid, name, previousRole) {
