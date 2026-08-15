@@ -221,40 +221,46 @@
 
     @media (max-width: 768px) {
       .nav-container {
-        padding: 0 10px;
-        gap: 4px;
+        flex-wrap: wrap;
+        height: auto;
+        padding: 8px 12px;
+        gap: 4px 10px;
       }
       .nav-version { display: none; }
       .nav-pages-center {
+        order: 3;
         position: static;
         transform: none;
-        margin: 0 auto;
-        gap: 2px;
-        min-width: 0;
+        width: 100%;
+        justify-content: center;
+        margin: 0;
+        gap: 4px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(212,175,55,0.12);
       }
       .nav-pages-center .nav-page-link {
-        font-size: 0.64rem !important;
-        padding: 6px 6px !important;
-        letter-spacing: 0.2px !important;
+        font-size: 0.7rem !important;
+        padding: 7px 12px !important;
+        letter-spacing: 0.3px !important;
       }
       .nav-auth-btn {
-        padding: 6px 10px;
+        padding: 7px 12px;
         font-size: 0.75rem;
         margin-left: 6px;
       }
       .nav-auth-btn .auth-text { display: none; }
       .nav-auth-btn .auth-icon { font-size: 1.1rem; }
-      .nav-search-btn { padding: 6px 8px; }
+      .nav-search-btn { padding: 6px 9px; }
     }
 
     @media (max-width: 480px) {
-      .nav-logo { font-size: 0.7rem; letter-spacing: 1px; }
+      .nav-logo { font-size: 0.8rem; letter-spacing: 1px; }
       .nav-pages-center .nav-page-link {
-        font-size: 0.58rem !important;
-        padding: 6px 4px !important;
+        font-size: 0.64rem !important;
+        padding: 7px 9px !important;
       }
-      .nav-auth-btn { padding: 6px 8px; }
-      .nav-search-btn { padding: 6px 6px; }
+      .nav-auth-btn { padding: 7px 9px; }
+      .nav-search-btn { padding: 6px 7px; }
     }
 
     /* ===== REVIEW VOTES (Reddit-style) ===== */
@@ -1356,6 +1362,10 @@
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
 
+      html {
+        scroll-padding-top: 110px;
+      }
+
       .hero,
       .content-wrapper,
       .footer {
@@ -1363,7 +1373,7 @@
       }
 
       .hero {
-        padding: 100px 20px 60px;
+        padding: 120px 20px 60px;
         min-height: 85vh;
       }
 
@@ -2295,6 +2305,10 @@
       height: 3px;
       z-index: 999;
       background: rgba(212,175,55,0.08);
+    }
+
+    @media (max-width: 768px) {
+      .reading-progress { top: 96px; }
     }
 
     .reading-progress-fill {
