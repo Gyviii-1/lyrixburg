@@ -2837,10 +2837,6 @@
       box-shadow: 0 0 22px var(--glow-gold);
     }
 
-    .theme-toggle:hover {
-      box-shadow: 0 0 26px var(--glow-gold);
-    }
-
     /* --- Виньетка (глубина фона) --- */
     body::after {
       content: '';
@@ -2939,7 +2935,6 @@
     @media (max-width: 480px) {
       .toc-fab { left: auto; right: 88px; }
       .toc-panel { left: 16px; right: 16px; width: auto; }
-      .theme-toggle { left: 16px; }
     }
 
     /* --- Уважение к настройкам движения --- */
@@ -2961,71 +2956,8 @@
     }
 
     /* ============================================================
-       ===== АТМОСФЕРА: ДРАКОН КРАЯ / ЛАВА АДА / ЛЕПЕСТКИ =====
+       ===== АТМОСФЕРА (декор убран) =====
        ============================================================ */
-    .env-deco {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .env-layer { position: absolute; inset: 0; display: none; }
-
-    /* Дракон Края */
-    [data-theme="end"] .env-end { display: block; }
-    .end-dragon {
-      position: absolute;
-      top: 13%;
-      left: -420px;
-      width: 360px;
-      height: auto;
-      opacity: 0.5;
-      filter: drop-shadow(0 0 26px rgba(176,108,255,0.6));
-      animation: dragonFly 44s linear infinite;
-    }
-    @keyframes dragonFly {
-      0% { transform: translateX(0) translateY(0) scale(0.92); }
-      50% { transform: translateX(60vw) translateY(7vh) scale(1.06); }
-      100% { transform: translateX(130vw) translateY(-3vh) scale(0.92); }
-    }
-
-    /* Лава Ада по бокам */
-    [data-theme="nether"] .env-nether { display: block; }
-    .lava-column {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 44px;
-      background: linear-gradient(180deg, rgba(255,180,40,0) 0%, rgba(255,120,20,0.28) 14%, rgba(255,60,10,0.42) 100%);
-      overflow: hidden;
-    }
-    .lava-left { left: 0; }
-    .lava-right { right: 0; transform: scaleX(-1); }
-    .lava-column::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: -160px;
-      bottom: -160px;
-      background:
-        radial-gradient(circle at 42% 38%, #ffd24d 0 5px, transparent 6px),
-        radial-gradient(circle at 66% 24%, #ff9b2a 0 7px, transparent 8px),
-        radial-gradient(circle at 30% 68%, #ff6a1a 0 6px, transparent 7px),
-        radial-gradient(circle at 70% 84%, #ffb347 0 5px, transparent 6px);
-      background-size: 100% 150px;
-      animation: lavaFlow 5.5s linear infinite;
-    }
-    @keyframes lavaFlow {
-      from { transform: translateY(-150px); }
-      to { transform: translateY(150px); }
-    }
-
-    @media (max-width: 768px) {
-      .end-dragon { width: 210px; opacity: 0.34; }
-      .lava-column { width: 24px; }
-    }
 
     /* ============================================================
        ===== НАСТРОЙКИ: АККАУНТ / ТЕМА / ОБРАЩЕНИЯ =====
