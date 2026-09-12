@@ -1035,7 +1035,7 @@
     .scroll-indicator {
       position: absolute;
       bottom: 30px;
-      left: calc(50% + 110px);
+      left: calc(50% + 70px);
       transform: translateX(-50%);
       z-index: 1;
       animation: bounce 2s ease-in-out infinite;
@@ -1045,6 +1045,7 @@
     .scroll-indicator:hover svg {
       opacity: 1;
       stroke: var(--gold);
+      filter: drop-shadow(0 0 10px var(--glow-gold)) brightness(1.4);
     }
 
     .scroll-indicator svg {
