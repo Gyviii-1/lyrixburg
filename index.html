@@ -723,6 +723,13 @@
   <!-- BACK TO TOP -->
   <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+  <!-- FLOATING CONTENTS -->
+  <button class="toc-fab" id="tocFab" onclick="toggleTocPanel()" title="Содержание">☰</button>
+  <div class="toc-panel" id="tocPanel">
+    <div class="toc-panel-title">Содержание</div>
+    <div id="tocPanelList"></div>
+  </div>
+
   <!-- TOAST -->
   <div class="toast" id="toast">✅ Текст клятвы скопирован!</div>
 

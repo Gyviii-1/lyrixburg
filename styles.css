@@ -2506,4 +2506,352 @@
       -ms-user-select: text;
       user-select: text;
     }
+
+    /* ============================================================
+       ===== РЕДИЗАЙН v0.3 — ЭПОХА КРАЯ / ЭПОХА АДА =====
+       ============================================================ */
+
+    /* --- Палитра: Эпоха Края (фиолетовая тема) --- */
+    :root, [data-theme="purple"] {
+      --bg-primary: #08050f;
+      --bg-secondary: #110a1f;
+      --bg-card: #140c24;
+      --bg-card-alt: #1d1136;
+      --gold: #b06cff;
+      --gold-light: #d9b3ff;
+      --gold-dark: #7d3fd1;
+      --amber: #b06cff;
+      --text-primary: #ece4fb;
+      --text-secondary: #b9a9d6;
+      --text-muted: #7d6f9c;
+      --border-gold: rgba(176,108,255,0.32);
+      --border-card: rgba(176,108,255,0.14);
+      --glow-gold: rgba(176,108,255,0.42);
+      --parchment: #1d1136;
+      --parchment-dark: #140c24;
+      --scroll-text: #ece4fb;
+      --nav-bg: rgba(8,5,15,0.96);
+      --navbar-bg: rgba(8,5,15,0.86);
+      --btn-bg1: #22123f;
+      --btn-bg2: #3d1f6e;
+      --btn-hover1: #3d1f6e;
+      --btn-hover2: #5a2fa0;
+      --env-a: rgba(139,61,255,0.20);
+      --env-b: rgba(52,12,92,0.60);
+      --particle-color: #c9a6ff;
+      --particle-glow: rgba(176,108,255,0.95);
+      --star-color: rgba(222,204,255,0.9);
+    }
+
+    /* --- Палитра: Эпоха Ада (золотая тема) --- */
+    [data-theme="gold"] {
+      --bg-primary: #150504;
+      --bg-secondary: #210806;
+      --bg-card: #240a07;
+      --bg-card-alt: #35100a;
+      --gold: #ff8c1a;
+      --gold-light: #ffc266;
+      --gold-dark: #c2410c;
+      --amber: #ffd166;
+      --text-primary: #f6e3d6;
+      --text-secondary: #c9a48f;
+      --text-muted: #8c6a5a;
+      --border-gold: rgba(255,140,26,0.32);
+      --border-card: rgba(255,140,26,0.14);
+      --glow-gold: rgba(255,90,20,0.45);
+      --parchment: #35100a;
+      --parchment-dark: #240a07;
+      --scroll-text: #f6e3d6;
+      --nav-bg: rgba(21,5,4,0.97);
+      --navbar-bg: rgba(21,5,4,0.88);
+      --btn-bg1: #3a1109;
+      --btn-bg2: #6b1d0a;
+      --btn-hover1: #6b1d0a;
+      --btn-hover2: #a02a08;
+      --env-a: rgba(255,90,20,0.18);
+      --env-b: rgba(96,12,0,0.60);
+      --particle-color: #ffb347;
+      --particle-glow: rgba(255,120,20,0.95);
+      --star-color: rgba(255,186,96,0.9);
+    }
+
+    /* --- Фон-среда --- */
+    body {
+      background-color: var(--bg-primary);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -15%, var(--env-a), transparent 70%),
+        radial-gradient(ellipse 70% 55% at 50% 115%, var(--env-b), transparent 72%);
+      background-attachment: fixed;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* Край: звёздное небо Бездны */
+    :root body::before,
+    [data-theme="purple"] body::before {
+      background-image:
+        radial-gradient(1.6px 1.6px at 20px 30px, var(--star-color), transparent),
+        radial-gradient(1px 1px at 130px 80px, var(--star-color), transparent),
+        radial-gradient(1.6px 1.6px at 60px 160px, var(--star-color), transparent),
+        radial-gradient(1px 1px at 180px 120px, var(--star-color), transparent),
+        radial-gradient(1px 1px at 90px 20px, var(--star-color), transparent),
+        radial-gradient(1.4px 1.4px at 160px 190px, var(--star-color), transparent);
+      background-size: 220px 220px;
+      opacity: 0.55;
+      animation: starDrift 120s linear infinite;
+    }
+
+    @keyframes starDrift {
+      from { background-position: 0 0; }
+      to { background-position: 0 -440px; }
+    }
+
+    /* Ад: зарево лавы снизу */
+    [data-theme="gold"] body::before {
+      background:
+        radial-gradient(ellipse 95% 42% at 50% 118%, rgba(255,90,10,0.32), transparent 72%),
+        radial-gradient(ellipse 55% 28% at 22% 108%, rgba(190,40,0,0.30), transparent 72%),
+        radial-gradient(ellipse 55% 28% at 80% 110%, rgba(255,140,20,0.22), transparent 72%);
+      animation: lavaPulse 7s ease-in-out infinite;
+    }
+
+    @keyframes lavaPulse {
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 1; }
+    }
+
+    /* --- Частицы под темы --- */
+    .particle {
+      background: var(--particle-color);
+      box-shadow: 0 0 8px 1px var(--particle-glow);
+    }
+
+    :root .particle,
+    [data-theme="purple"] .particle {
+      animation-name: voidFloat;
+      animation-timing-function: ease-in-out;
+    }
+
+    [data-theme="gold"] .particle {
+      animation-name: emberFloat;
+      animation-timing-function: ease-in;
+    }
+
+    @keyframes voidFloat {
+      0% { opacity: 0; transform: translateY(30px) translateX(0) scale(0.6); }
+      15% { opacity: 0.9; }
+      50% { transform: translateY(-45vh) translateX(16px) scale(1); }
+      85% { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(-105vh) translateX(-12px) scale(0.4); }
+    }
+
+    @keyframes emberFloat {
+      0% { opacity: 0; transform: translateY(40px) translateX(0) scale(0.7); }
+      10% { opacity: 1; }
+      60% { opacity: 0.8; transform: translateY(-60vh) translateX(20px) scale(0.9); }
+      100% { opacity: 0; transform: translateY(-105vh) translateX(38px) scale(0.25); }
+    }
+
+    /* --- Герой --- */
+    .hero::before {
+      background:
+        radial-gradient(ellipse at 50% 0%, var(--env-a) 0%, transparent 62%),
+        radial-gradient(ellipse at 50% 100%, var(--env-b) 0%, transparent 62%);
+    }
+
+    .hero-emblem {
+      filter: none !important;
+      animation: float 4s ease-in-out infinite, emblemGlow 4s ease-in-out infinite;
+    }
+
+    @keyframes emblemGlow {
+      0%, 100% { text-shadow: 0 0 22px var(--glow-gold); }
+      50% { text-shadow: 0 0 62px var(--glow-gold), 0 0 18px var(--glow-gold); }
+    }
+
+    .hero-title {
+      text-shadow: 0 0 40px var(--glow-gold);
+    }
+
+    .hero-divider {
+      box-shadow: 0 0 14px var(--glow-gold);
+    }
+
+    /* --- Карточки --- */
+    .card::before {
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      background-size: 200% 100%;
+      animation: cardShimmer 6s linear infinite;
+    }
+
+    @keyframes cardShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .card:hover {
+      transform: translateY(-4px) !important;
+      border-color: var(--glow-gold);
+      box-shadow:
+        0 14px 46px rgba(0, 0, 0, 0.45),
+        0 0 30px var(--glow-gold);
+    }
+
+    details[open] {
+      box-shadow: 0 0 20px var(--glow-gold);
+    }
+
+    /* --- Заголовки секций --- */
+    .section-title {
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 64px;
+      height: 2px;
+      margin: 12px auto 0;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      animation: underlinePulse 3.5s ease-in-out infinite;
+    }
+
+    @keyframes underlinePulse {
+      0%, 100% { width: 48px; opacity: 0.55; box-shadow: 0 0 6px var(--glow-gold); }
+      50% { width: 96px; opacity: 1; box-shadow: 0 0 16px var(--glow-gold); }
+    }
+
+    /* --- Кнопки и мелочи --- */
+    .btn-gold:hover {
+      box-shadow: 0 0 22px var(--glow-gold);
+    }
+
+    .theme-toggle:hover {
+      box-shadow: 0 0 26px var(--glow-gold);
+    }
+
+    /* --- Виньетка (глубина фона) --- */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 45%, transparent 62%, rgba(0,0,0,0.5) 100%);
+    }
+
+    /* --- Плавающее оглавление --- */
+    .toc-fab {
+      position: fixed;
+      bottom: 30px;
+      left: 84px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border-gold);
+      background: var(--bg-card);
+      color: var(--gold);
+      font-size: 1.15rem;
+      cursor: pointer;
+      z-index: 998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    .toc-fab:hover { box-shadow: 0 0 20px var(--glow-gold); transform: scale(1.1); }
+
+    .toc-panel {
+      position: fixed;
+      bottom: 86px;
+      left: 30px;
+      width: 270px;
+      max-width: calc(100vw - 60px);
+      max-height: 62vh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 14px;
+      padding: 14px;
+      z-index: 998;
+      display: none;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.55), 0 0 24px var(--glow-gold);
+    }
+    .toc-panel.open { display: block; animation: tocIn 0.28s ease; }
+
+    @keyframes tocIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .toc-panel-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 0.8rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .toc-panel-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      padding: 9px 12px;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .toc-panel-item:hover {
+      color: var(--gold-light);
+      background: var(--border-card);
+      border-color: var(--border-gold);
+      transform: translateX(3px);
+    }
+    .toc-panel-item .toc-page {
+      margin-left: auto;
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 480px) {
+      .toc-fab { left: auto; right: 88px; }
+      .toc-panel { left: 16px; right: 16px; width: auto; }
+      .theme-toggle { left: 16px; }
+    }
+
+    /* --- Уважение к настройкам движения --- */
+    @media (prefers-reduced-motion: reduce) {
+      body::before,
+      .particle,
+      .card::before,
+      .hero-emblem,
+      .section-title::after,
+      .toc-panel.open {
+        animation: none !important;
+      }
+    }
+
+    /* --- Печать: убрать новые слои --- */
+    @media print {
+      body::before, body::after, .toc-fab, .toc-panel { display: none !important; }
+      .section-title::after { display: none; }
+    }
   

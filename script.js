@@ -89,6 +89,17 @@
     /* ==================== CHANGELOG ==================== */
     var SITE_CHANGELOG = [
       {
+        version: 'v0.3.0',
+        date: '12 сент. 2026',
+        items: [
+          'Редизайн тем: «Эпоха Края» (фиолетовая) и «Эпоха Ада» (огненная)',
+          'Живой фон: звёзды Бездны и зарево лавы, новые частицы',
+          'Анимации: свечение заголовков, подъём карточек, мерцание линий',
+          'Плавающее оглавление (кнопка ☰ слева внизу)',
+          'Обновлены иконки переключателя тем'
+        ]
+      },
+      {
         version: 'v0.2.48',
         date: '10 авг. 2026',
         items: [
@@ -1937,24 +1948,87 @@
     // Hide loading after timeout if Firebase doesn't respond
     setTimeout(hideLoading, 5000);
 
+    // ===== FLOATING CONTENTS =====
+    var TOC_ITEMS = [
+      { page: 'laws', id: 'part1', icon: '📜', label: 'Устав города' },
+      { page: 'laws', id: 'part2', icon: '⚖️', label: 'Билль о правах' },
+      { page: 'laws', id: 'part3', icon: '📋', label: 'Кодекс штрафов' },
+      { page: 'economy', id: 'part4', icon: '🏦', label: 'Экономический кодекс' },
+      { page: 'economy', id: 'oath', icon: '🤝', label: 'Клятва верности' },
+      { page: 'community', id: 'citizens', icon: '🏘️', label: 'Жители' },
+      { page: 'community', id: 'blacklist', icon: '🚫', label: 'Чёрный список' },
+      { page: 'community', id: 'ratings', icon: '⭐', label: 'Оценка города' }
+    ];
+    var TOC_PAGES = { laws: 'Законы', economy: 'Экономика', community: 'Сообщество' };
+
+    function buildTocPanel() {
+      var list = document.getElementById('tocPanelList');
+      if (!list) return;
+      list.innerHTML = TOC_ITEMS.map(function(it) {
+        return '<button class="toc-panel-item" onclick="tocGo(\'' + it.page + '\',\'' + it.id + '\')">' +
+          '<span>' + it.icon + '</span><span>' + esc(it.label) + '</span>' +
+          '<span class="toc-page">' + (TOC_PAGES[it.page] || '') + '</span></button>';
+      }).join('');
+    }
+
+    function toggleTocPanel() {
+      var p = document.getElementById('tocPanel');
+      if (p) p.classList.toggle('open');
+    }
+
+    function closeTocPanel() {
+      var p = document.getElementById('tocPanel');
+      if (p) p.classList.remove('open');
+    }
+
+    function tocGo(page, id) {
+      closeTocPanel();
+      var samePage = (page === currentPage);
+      if (!samePage) {
+        var link = document.querySelector('.nav-page-link[data-page="' + page + '"]');
+        switchPage(page, link);
+      }
+      setTimeout(function() {
+        var target = document.getElementById(id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, samePage ? 60 : 640);
+    }
+
+    document.addEventListener('click', function(e) {
+      var p = document.getElementById('tocPanel');
+      var fab = document.getElementById('tocFab');
+      if (!p || !p.classList.contains('open')) return;
+      if (p.contains(e.target) || (fab && fab.contains(e.target))) return;
+      p.classList.remove('open');
+    });
+
+    buildTocPanel();
+
     // ===== THEME TOGGLE =====
+    function applyThemeUi(theme) {
+      var btn = document.getElementById('themeToggle');
+      if (btn) {
+        btn.textContent = (theme === 'gold') ? '🔥' : '🌌';
+        btn.title = (theme === 'gold') ? 'Эпоха Ада (огненная тема)' : 'Эпоха Края (фиолетовая тема)';
+      }
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', (theme === 'gold') ? '#150504' : '#08050f');
+    }
+
     function toggleTheme() {
       var html = document.documentElement;
       var current = html.getAttribute('data-theme');
       var next = (current === 'gold') ? 'purple' : 'gold';
       html.setAttribute('data-theme', next);
       localStorage.setItem('lb_theme', next);
-      document.getElementById('themeToggle').textContent = (next === 'gold') ? '💜' : '✨';
+      applyThemeUi(next);
     }
 
     // Apply saved theme on load
     (function() {
-      var saved = localStorage.getItem('lb_theme');
-      if (saved) {
-        document.documentElement.setAttribute('data-theme', saved);
-        var btn = document.getElementById('themeToggle');
-        if (btn) btn.textContent = (saved === 'gold') ? '💜' : '✨';
-      }
+      var saved = localStorage.getItem('lb_theme') || 'purple';
+      document.documentElement.setAttribute('data-theme', saved);
+      applyThemeUi(saved);
     })();
 
     // ===== BASIC PAGE PROTECTION =====
