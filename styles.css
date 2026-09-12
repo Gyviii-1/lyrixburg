@@ -1035,7 +1035,7 @@
     .scroll-indicator {
       position: absolute;
       bottom: 30px;
-      left: calc(50% + 70px);
+      left: calc(50% + 50px);
       transform: translateX(-50%);
       z-index: 1;
       animation: bounce 2s ease-in-out infinite;
