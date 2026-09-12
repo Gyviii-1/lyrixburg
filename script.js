@@ -89,6 +89,17 @@
     /* ==================== CHANGELOG ==================== */
     var SITE_CHANGELOG = [
       {
+        version: 'v0.4.0',
+        date: '12 сент. 2026',
+        items: [
+          'Окно «Настройки» (⚙️ в шапке): Аккаунт / Тема / Обращения',
+          'Четыре темы: Эпоха Края 🌌, Эпоха Ада 🔥 (багровый Незерак + стекающая лава), Золотая ✨, Сакура 🌸',
+          'В Эпохе Края летает дракон Края, в Сакуре падают лепестки',
+          'Удаление аккаунта (с подтверждением паролем)',
+          'Обращения к админам: тикеты с ответами, видны автору и администрации'
+        ]
+      },
+      {
         version: 'v0.3.0',
         date: '12 сент. 2026',
         items: [
@@ -531,7 +542,7 @@
 
     function handleNavAuthClick() {
       if (currentUser) {
-        openProfile();
+        openSettings('account');
       } else {
         openAuth('login');
       }
@@ -2004,32 +2015,394 @@
 
     buildTocPanel();
 
-    // ===== THEME TOGGLE =====
+    // ===== THEME TOGGLE (4 темы) =====
+    var THEMES = ['end', 'nether', 'gold', 'sakura'];
+    var THEME_META = {
+      end:    { icon: '🌌', name: 'Эпоха Края',  color: '#08050f' },
+      nether: { icon: '🔥', name: 'Эпоха Ада',   color: '#120406' },
+      gold:   { icon: '✨', name: 'Золотая',     color: '#0D0D0D' },
+      sakura: { icon: '🌸', name: 'Сакура',      color: '#1a0d14' }
+    };
+
+    function normalizeTheme(t) {
+      if (THEMES.indexOf(t) !== -1) return t;
+      if (t === 'purple') return 'end';
+      return 'end';
+    }
+
     function applyThemeUi(theme) {
       var btn = document.getElementById('themeToggle');
       if (btn) {
-        btn.textContent = (theme === 'gold') ? '🔥' : '🌌';
-        btn.title = (theme === 'gold') ? 'Эпоха Ада (огненная тема)' : 'Эпоха Края (фиолетовая тема)';
+        btn.textContent = THEME_META[theme].icon;
+        btn.title = THEME_META[theme].name;
       }
       var meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', (theme === 'gold') ? '#150504' : '#08050f');
+      if (meta) meta.setAttribute('content', THEME_META[theme].color);
+    }
+
+    function setTheme(theme) {
+      theme = normalizeTheme(theme);
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('lb_theme', theme);
+      applyThemeUi(theme);
+      renderThemeGrid();
     }
 
     function toggleTheme() {
-      var html = document.documentElement;
-      var current = html.getAttribute('data-theme');
-      var next = (current === 'gold') ? 'purple' : 'gold';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('lb_theme', next);
-      applyThemeUi(next);
+      var cur = normalizeTheme(document.documentElement.getAttribute('data-theme'));
+      var idx = (THEMES.indexOf(cur) + 1) % THEMES.length;
+      setTheme(THEMES[idx]);
     }
 
     // Apply saved theme on load
     (function() {
-      var saved = localStorage.getItem('lb_theme') || 'purple';
-      document.documentElement.setAttribute('data-theme', saved);
-      applyThemeUi(saved);
+      setTheme(normalizeTheme(localStorage.getItem('lb_theme') || 'end'));
     })();
+
+    /* ==================== SETTINGS MODAL ==================== */
+    var settingsTab = 'account';
+
+    function getRoleLabel() {
+      return isMayor() ? '👑 Мэр Луриксбурга' : isDeputy() ? '⭐ Зам мэра' : isSheriff() ? '🔰 Шериф'
+        : (currentUserData && currentUserData.role === 'admin') ? '⚔ Администратор' : '🛡️ Гражданин';
+    }
+
+    function openSettings(tab) {
+      settingsTab = tab || 'account';
+      document.getElementById('settingsModal').classList.add('open');
+      switchSettingsTab(settingsTab);
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.remove('open');
+      supportOpenTicket = null;
+    }
+
+    document.getElementById('settingsModal').addEventListener('click', function(e) {
+      if (e.target.id === 'settingsModal') closeSettings();
+    });
+
+    function switchSettingsTab(tab) {
+      settingsTab = tab;
+      document.querySelectorAll('.settings-tab').forEach(function(b) {
+        b.classList.toggle('active', b.getAttribute('data-tab') === tab);
+      });
+      ['account', 'theme', 'support'].forEach(function(t) {
+        var el = document.getElementById('settings-' + t);
+        if (el) el.style.display = (t === tab) ? 'block' : 'none';
+      });
+      if (tab === 'account') renderSettingsAccount();
+      if (tab === 'theme') renderThemeGrid();
+      if (tab === 'support') { supportOpenTicket = null; renderSupport(); }
+    }
+
+    function renderSettingsAccount() {
+      var el = document.getElementById('settings-account');
+      if (!el) return;
+      if (!currentUser) {
+        el.innerHTML = '<div class="settings-note">Войдите в аккаунт, чтобы управлять профилем и писать администрации.</div>' +
+          '<button class="btn-gold" style="width:100%;padding:12px;" onclick="closeSettings();openAuth(\'login\')">👤 Войти</button>';
+        return;
+      }
+      var name = getDisplayName();
+      el.innerHTML =
+        '<div class="settings-account-head">' +
+          '<div class="nav-user-avatar">' + esc(name.substring(0, 2).toUpperCase()) + '</div>' +
+          '<div><div class="settings-account-name">' + esc(name) + '</div>' +
+          '<div class="settings-account-role">' + getRoleLabel() + '</div></div>' +
+        '</div>' +
+        '<div class="settings-section-label">🔐 Смена пароля</div>' +
+        '<div class="field"><input type="password" id="setPass1" placeholder="Новый пароль (мин. 6)" maxlength="40"></div>' +
+        '<div class="field"><input type="password" id="setPass2" placeholder="Повторите пароль" maxlength="40"></div>' +
+        '<div class="modal-error" id="setPassError"></div>' +
+        '<div class="modal-success" id="setPassSuccess" style="color:#81C784; font-size:0.85rem; text-align:center; min-height:18px;"></div>' +
+        '<button class="btn-gold" style="width:100%;padding:12px;" onclick="changePasswordSettings()">🔑 Сохранить пароль</button>' +
+        '<div class="settings-section-label">⚙️ Прочее</div>' +
+        '<button class="btn-gold ghost" style="width:100%;padding:12px;" onclick="closeSettings();logout()">🚪 Выйти из аккаунта</button>' +
+        '<div class="settings-section-label" style="color:#EF5350;">⚠️ Опасная зона</div>' +
+        '<div class="settings-danger">' +
+          '<p>Удаление аккаунта необратимо: профиль и доступ будут стёрты.</p>' +
+          '<input type="password" id="setDeletePass" placeholder="Введите пароль для подтверждения" maxlength="40" style="margin-bottom:10px;">' +
+          '<div class="modal-error" id="setDeleteError"></div>' +
+          '<button class="btn-gold" style="width:100%;padding:12px;background:linear-gradient(135deg,#B71C1C,#C62828);border-color:#E53935;" onclick="confirmDeleteAccount()">🗑️ Удалить аккаунт</button>' +
+        '</div>';
+    }
+
+    function changePasswordSettings() {
+      var pass1 = document.getElementById('setPass1').value;
+      var pass2 = document.getElementById('setPass2').value;
+      var errEl = document.getElementById('setPassError');
+      var okEl = document.getElementById('setPassSuccess');
+      errEl.textContent = '';
+      okEl.textContent = '';
+      if (pass1.length < 6) { errEl.textContent = 'Пароль должен быть не короче 6 символов'; return; }
+      if (pass1 !== pass2) { errEl.textContent = 'Пароли не совпадают'; return; }
+      if (!auth.currentUser) { errEl.textContent = 'Сессия истекла. Войдите заново.'; return; }
+      auth.currentUser.updatePassword(pass1)
+        .then(function() {
+          okEl.textContent = '✅ Пароль успешно обновлён!';
+          document.getElementById('setPass1').value = '';
+          document.getElementById('setPass2').value = '';
+          showToast('🔑 Пароль успешно изменён!');
+        })
+        .catch(function(error) {
+          errEl.textContent = (error.code === 'auth/requires-recent-login')
+            ? 'Требуется повторный вход. Выйдите и войдите заново'
+            : 'Ошибка: ' + (error.message || error.code);
+        });
+    }
+
+    function confirmDeleteAccount() {
+      if (!currentUser) return;
+      var pass = (document.getElementById('setDeletePass') || {}).value || '';
+      var errEl = document.getElementById('setDeleteError');
+      if (errEl) errEl.textContent = '';
+      if (pass.length < 6) { if (errEl) errEl.textContent = 'Введите пароль для подтверждения'; return; }
+      if (!confirm('Удалить аккаунт НАВСЕГДА? Это необратимо.')) return;
+      var cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, pass);
+      currentUser.reauthenticateWithCredential(cred)
+        .then(function() { return db.collection('users').doc(currentUser.uid).delete(); })
+        .then(function() { return auth.currentUser.delete(); })
+        .then(function() {
+          writeLog('account_delete', 'Пользователь удалил свой аккаунт');
+          closeSettings();
+          showToast('🗑️ Аккаунт удалён');
+        })
+        .catch(function(e) {
+          if (errEl) errEl.textContent = (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
+            ? 'Неверный пароль' : 'Ошибка: ' + (e.message || e.code);
+        });
+    }
+
+    function renderThemeGrid() {
+      var grid = document.getElementById('themeGrid');
+      if (!grid) return;
+      var cur = normalizeTheme(document.documentElement.getAttribute('data-theme'));
+      grid.innerHTML = THEMES.map(function(t) {
+        var m = THEME_META[t];
+        return '<button class="theme-card' + (t === cur ? ' selected' : '') + '" onclick="setTheme(\'' + t + '\')">' +
+          '<span class="theme-swatch swatch-' + t + '"></span>' +
+          '<span class="theme-card-name">' + m.icon + ' ' + m.name + '</span>' +
+          '</button>';
+      }).join('');
+    }
+
+    /* ==================== SUPPORT TICKETS ==================== */
+    var supportViewAll = false;
+    var supportOpenTicket = null;
+    var lastTicketSubmit = 0;
+
+    function renderSupport() {
+      var root = document.getElementById('supportRoot');
+      if (!root) return;
+      if (!currentUser) {
+        root.innerHTML = '<div class="settings-note">Войдите в аккаунт, чтобы написать администрации об ошибке или предложении.</div>' +
+          '<button class="btn-gold" style="width:100%;padding:12px;" onclick="closeSettings();openAuth(\'login\')">👤 Войти</button>';
+        return;
+      }
+      var staff = isStaff();
+      root.innerHTML =
+        '<div class="support-head">' +
+          '<button class="btn-gold" onclick="openNewTicket()">✉️ Новое обращение</button>' +
+          (staff ? '<button class="btn-gold ghost" onclick="toggleSupportView()">' + (supportViewAll ? '👤 Мои обращения' : '📋 Все обращения') + '</button>' : '') +
+        '</div><div id="supportList"><div class="settings-note"><span class="loading-spinner"></span> Загрузка...</div></div>';
+      loadTicketList();
+    }
+
+    function toggleSupportView() {
+      supportViewAll = !supportViewAll;
+      renderSupport();
+    }
+
+    function loadTicketList() {
+      var list = document.getElementById('supportList');
+      if (!list) return;
+      var useAll = isStaff() && supportViewAll;
+      var q = useAll
+        ? db.collection('tickets').orderBy('updatedAt', 'desc').limit(200)
+        : db.collection('tickets').where('userId', '==', currentUser.uid);
+      q.get().then(function(snap) {
+        var items = [];
+        snap.forEach(function(d) { var o = d.data(); o.id = d.id; items.push(o); });
+        if (!useAll) {
+          items.sort(function(a, b) {
+            return ((b.updatedAt ? b.updatedAt.toMillis() : 0) - (a.updatedAt ? a.updatedAt.toMillis() : 0));
+          });
+        }
+        if (!items.length) { list.innerHTML = '<div class="settings-note">Обращений пока нет</div>'; return; }
+        list.innerHTML = items.map(renderTicketRow).join('');
+      }).catch(function(e) {
+        list.innerHTML = '<div class="settings-note">Ошибка загрузки: ' + esc(e.message || e.code) + '</div>';
+      });
+    }
+
+    function renderTicketRow(t) {
+      var typeIcon = (t.type === 'bug') ? '🐞' : '💡';
+      var statusTxt = (t.status === 'closed') ? '🔒 Закрыто' : '🟢 Открыто';
+      var when = t.updatedAt ? fmtDate(t.updatedAt.toDate()) : '';
+      var showAuthor = isStaff() && supportViewAll;
+      return '<button class="ticket-row" onclick="openTicket(\'' + t.id + '\')">' +
+        '<span class="ticket-type">' + typeIcon + '</span>' +
+        '<span class="ticket-main">' +
+          '<span class="ticket-title">' + esc(t.title) + '</span>' +
+          '<span class="ticket-meta">' + (showAuthor ? esc(t.username) + ' • ' : '') + statusTxt + ' • ' + (t.messageCount || 1) + ' сообщ.</span>' +
+        '</span>' +
+        '<span class="ticket-when">' + when + '</span></button>';
+    }
+
+    function openNewTicket() {
+      supportOpenTicket = null;
+      var root = document.getElementById('supportRoot');
+      root.innerHTML =
+        '<button class="link-back" onclick="renderSupport()">← Назад</button>' +
+        '<div class="field"><label>Тип обращения</label>' +
+          '<select id="ticketType" class="settings-select"><option value="bug">🐞 Ошибка</option><option value="suggestion">💡 Предложение</option></select></div>' +
+        '<div class="field"><label>Кратко</label>' +
+          '<input type="text" id="ticketTitle" maxlength="80" placeholder="Например: не работает кнопка входа"></div>' +
+        '<div class="field"><label>Описание</label>' +
+          '<textarea id="ticketText" rows="4" maxlength="1000" placeholder="Опишите подробнее..."></textarea></div>' +
+        '<div class="modal-error" id="ticketError"></div>' +
+        '<button class="btn-gold" style="width:100%;padding:12px;" onclick="createTicket()">Отправить</button>';
+    }
+
+    function createTicket() {
+      if (!currentUser) return;
+      var now = Date.now();
+      var errEl = document.getElementById('ticketError');
+      if (now - lastTicketSubmit < 15000) { if (errEl) errEl.textContent = '⏳ Слишком часто — подождите немного'; return; }
+      var type = document.getElementById('ticketType').value;
+      var title = document.getElementById('ticketTitle').value.trim();
+      var text = document.getElementById('ticketText').value.trim();
+      if (title.length < 3) { if (errEl) errEl.textContent = 'Введите тему (мин. 3 символа)'; return; }
+      if (text.length < 5) { if (errEl) errEl.textContent = 'Опишите проблему (мин. 5 символов)'; return; }
+      lastTicketSubmit = now;
+      var name = getDisplayName();
+      db.collection('tickets').add({
+        userId: currentUser.uid,
+        username: name,
+        type: type,
+        title: title,
+        status: 'open',
+        messageCount: 1,
+        lastMessage: text.substring(0, 100),
+        lastSender: 'user',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function(ref) {
+        return db.collection('tickets').doc(ref.id).collection('messages').add({
+          senderId: currentUser.uid,
+          senderName: name,
+          isStaff: false,
+          text: text,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).then(function() {
+        writeLog('ticket_create', title);
+        showToast('✉️ Обращение отправлено');
+        supportOpenTicket = null;
+        renderSupport();
+      }).catch(function(e) {
+        if (errEl) errEl.textContent = 'Ошибка: ' + (e.message || e.code);
+      });
+    }
+
+    function openTicket(id) {
+      supportOpenTicket = id;
+      renderTicketThread(id);
+    }
+
+    function closeTicketThread() {
+      supportOpenTicket = null;
+      renderSupport();
+    }
+
+    function renderTicketThread(id) {
+      var root = document.getElementById('supportRoot');
+      root.innerHTML = '<button class="link-back" onclick="closeTicketThread()">← Назад</button>' +
+        '<div id="ticketThread"><div class="settings-note"><span class="loading-spinner"></span> Загрузка...</div></div>';
+      var thread = document.getElementById('ticketThread');
+      db.collection('tickets').doc(id).get().then(function(d) {
+        if (!d.exists) { thread.innerHTML = '<div class="settings-note">Обращение не найдено</div>'; return; }
+        var t = d.data();
+        var closed = (t.status === 'closed');
+        return db.collection('tickets').doc(id).collection('messages').orderBy('createdAt', 'asc').get()
+          .then(function(snap) {
+            var msgs = [];
+            snap.forEach(function(m) { msgs.push(m.data()); });
+            var me = currentUser ? currentUser.uid : null;
+            var html = '<div class="ticket-thread-head">' +
+              '<div class="ticket-thread-title">' + (t.type === 'bug' ? '🐞' : '💡') + ' ' + esc(t.title) + '</div>' +
+              '<div class="ticket-meta">' + esc(t.username) + ' • ' + (closed ? '🔒 Закрыто' : '🟢 Открыто') + '</div></div>' +
+              '<div class="ticket-msgs">' + msgs.map(function(m) {
+                var mine = (m.senderId === me);
+                return '<div class="ticket-msg' + (mine ? ' me' : '') + (m.isStaff ? ' staff' : '') + '">' +
+                  '<div class="ticket-msg-author">' + esc(m.senderName) + (m.isStaff ? ' 👑' : '') + '</div>' +
+                  '<div class="ticket-msg-text">' + esc(m.text) + '</div></div>';
+              }).join('') + '</div>';
+            if (closed) {
+              html += '<div class="settings-note">Обращение закрыто</div>';
+            } else {
+              html += '<div class="field"><textarea id="ticketReply" rows="3" maxlength="1000" placeholder="Ваш ответ..."></textarea></div>' +
+                '<div class="modal-error" id="ticketError"></div>' +
+                '<div class="ticket-btns">' +
+                  '<button class="btn-gold" onclick="sendTicketReply(\'' + id + '\')">Отправить</button>' +
+                  (isStaff() ? '<button class="btn-gold ghost" onclick="setTicketStatus(\'' + id + '\',\'closed\')">Закрыть</button>' : '') +
+                '</div>';
+            }
+            if (closed && isStaff()) {
+              html += '<button class="btn-gold ghost" style="margin-top:10px;padding:10px;" onclick="setTicketStatus(\'' + id + '\',\'open\')">Переоткрыть</button>';
+            }
+            thread.innerHTML = html;
+            var box = thread.querySelector('.ticket-msgs');
+            if (box) box.scrollTop = box.scrollHeight;
+          });
+      }).catch(function(e) {
+        thread.innerHTML = '<div class="settings-note">Ошибка: ' + esc(e.message || e.code) + '</div>';
+      });
+    }
+
+    function sendTicketReply(id) {
+      var ta = document.getElementById('ticketReply');
+      var errEl = document.getElementById('ticketError');
+      var text = ta ? ta.value.trim() : '';
+      if (text.length < 1) { if (errEl) errEl.textContent = 'Введите сообщение'; return; }
+      var staff = isStaff();
+      var name = getDisplayName();
+      db.collection('tickets').doc(id).collection('messages').add({
+        senderId: currentUser.uid,
+        senderName: name,
+        isStaff: staff,
+        text: text,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        return db.collection('tickets').doc(id).get();
+      }).then(function(d) {
+        var t = d.data();
+        return db.collection('tickets').doc(id).update({
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          messageCount: (t.messageCount || 0) + 1,
+          lastMessage: text.substring(0, 100),
+          lastSender: staff ? 'staff' : 'user'
+        });
+      }).then(function() {
+        writeLog('ticket_reply', (staff ? 'Админ ответил в тикете' : 'Ответ в тикете'));
+        renderTicketThread(id);
+      }).catch(function(e) {
+        if (errEl) errEl.textContent = 'Ошибка: ' + (e.message || e.code);
+      });
+    }
+
+    function setTicketStatus(id, status) {
+      if (!isStaff()) return;
+      db.collection('tickets').doc(id).update({
+        status: status,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        renderTicketThread(id);
+      }).catch(function(e) {
+        showToast('❌ Ошибка: ' + (e.message || e.code), true);
+      });
+    }
 
     // ===== BASIC PAGE PROTECTION =====
     // Block right-click

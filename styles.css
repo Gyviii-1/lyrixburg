@@ -2512,7 +2512,7 @@
        ============================================================ */
 
     /* --- Палитра: Эпоха Края (фиолетовая тема) --- */
-    :root, [data-theme="purple"] {
+    :root, [data-theme="end"], [data-theme="purple"] {
       --bg-primary: #08050f;
       --bg-secondary: #110a1f;
       --bg-card: #140c24;
@@ -2543,36 +2543,100 @@
       --star-color: rgba(222,204,255,0.9);
     }
 
-    /* --- Палитра: Эпоха Ада (золотая тема) --- */
-    [data-theme="gold"] {
-      --bg-primary: #150504;
-      --bg-secondary: #210806;
-      --bg-card: #240a07;
-      --bg-card-alt: #35100a;
-      --gold: #ff8c1a;
-      --gold-light: #ffc266;
-      --gold-dark: #c2410c;
+    /* --- Палитра: Эпоха Ада (багровый Незерак) --- */
+    [data-theme="nether"] {
+      --bg-primary: #120406;
+      --bg-secondary: #1c0608;
+      --bg-card: #220709;
+      --bg-card-alt: #330b0e;
+      --gold: #ff6a1a;
+      --gold-light: #ffa94d;
+      --gold-dark: #b3260f;
       --amber: #ffd166;
-      --text-primary: #f6e3d6;
-      --text-secondary: #c9a48f;
-      --text-muted: #8c6a5a;
-      --border-gold: rgba(255,140,26,0.32);
-      --border-card: rgba(255,140,26,0.14);
-      --glow-gold: rgba(255,90,20,0.45);
-      --parchment: #35100a;
-      --parchment-dark: #240a07;
-      --scroll-text: #f6e3d6;
-      --nav-bg: rgba(21,5,4,0.97);
-      --navbar-bg: rgba(21,5,4,0.88);
-      --btn-bg1: #3a1109;
-      --btn-bg2: #6b1d0a;
-      --btn-hover1: #6b1d0a;
-      --btn-hover2: #a02a08;
-      --env-a: rgba(255,90,20,0.18);
-      --env-b: rgba(96,12,0,0.60);
+      --text-primary: #f3dede;
+      --text-secondary: #c99a9a;
+      --text-muted: #8a5f5f;
+      --border-gold: rgba(255,90,30,0.32);
+      --border-card: rgba(255,90,30,0.14);
+      --glow-gold: rgba(255,70,20,0.45);
+      --parchment: #330b0e;
+      --parchment-dark: #220709;
+      --scroll-text: #f3dede;
+      --nav-bg: rgba(18,4,6,0.97);
+      --navbar-bg: rgba(18,4,6,0.88);
+      --btn-bg1: #360d0d;
+      --btn-bg2: #611512;
+      --btn-hover1: #611512;
+      --btn-hover2: #932014;
+      --env-a: rgba(255,70,20,0.18);
+      --env-b: rgba(110,10,8,0.62);
       --particle-color: #ffb347;
-      --particle-glow: rgba(255,120,20,0.95);
-      --star-color: rgba(255,186,96,0.9);
+      --particle-glow: rgba(255,110,20,0.95);
+      --star-color: rgba(255,170,90,0.9);
+    }
+
+    /* --- Палитра: Золотая (классическая жёлтая, как была) --- */
+    [data-theme="gold"] {
+      --bg-primary: #0D0D0D;
+      --bg-secondary: #1A1A1A;
+      --bg-card: #1E1610;
+      --bg-card-alt: #2A1E17;
+      --gold: #D4AF37;
+      --gold-light: #F2D06B;
+      --gold-dark: #A88B2A;
+      --amber: #FFBF00;
+      --text-primary: #F0E6D3;
+      --text-secondary: #B8A99A;
+      --text-muted: #7A6E63;
+      --border-gold: rgba(212,175,55,0.3);
+      --border-card: rgba(212,175,55,0.15);
+      --glow-gold: rgba(212,175,55,0.3);
+      --parchment: #2A1E17;
+      --parchment-dark: #1E1610;
+      --scroll-text: #F0E6D3;
+      --nav-bg: rgba(13,13,13,0.97);
+      --navbar-bg: rgba(13,13,13,0.9);
+      --btn-bg1: #2A1E17;
+      --btn-bg2: #4A3524;
+      --btn-hover1: #4A3524;
+      --btn-hover2: #6A4C32;
+      --env-a: rgba(212,175,55,0.16);
+      --env-b: rgba(60,45,20,0.5);
+      --particle-color: #F2D06B;
+      --particle-glow: rgba(212,175,55,0.95);
+      --star-color: rgba(242,208,107,0.9);
+    }
+
+    /* --- Палитра: Сакура (розовая, вишнёвый цвет) --- */
+    [data-theme="sakura"] {
+      --bg-primary: #1a0d14;
+      --bg-secondary: #241019;
+      --bg-card: #2a131d;
+      --bg-card-alt: #3a1a28;
+      --gold: #ff8fbf;
+      --gold-light: #ffc2dd;
+      --gold-dark: #cc5c8c;
+      --amber: #ffb3d1;
+      --text-primary: #fbe6f0;
+      --text-secondary: #d5aebf;
+      --text-muted: #9a7286;
+      --border-gold: rgba(255,143,191,0.32);
+      --border-card: rgba(255,143,191,0.14);
+      --glow-gold: rgba(255,143,191,0.42);
+      --parchment: #3a1a28;
+      --parchment-dark: #2a131d;
+      --scroll-text: #fbe6f0;
+      --nav-bg: rgba(26,13,20,0.96);
+      --navbar-bg: rgba(26,13,20,0.86);
+      --btn-bg1: #42182a;
+      --btn-bg2: #6e2745;
+      --btn-hover1: #6e2745;
+      --btn-hover2: #a03a68;
+      --env-a: rgba(255,143,191,0.18);
+      --env-b: rgba(110,35,70,0.55);
+      --particle-color: #ffc2dd;
+      --particle-glow: rgba(255,143,191,0.95);
+      --star-color: rgba(255,194,221,0.9);
     }
 
     /* --- Фон-среда --- */
@@ -2613,12 +2677,33 @@
     }
 
     /* Ад: зарево лавы снизу */
-    [data-theme="gold"] body::before {
+    [data-theme="nether"] body::before {
       background:
-        radial-gradient(ellipse 95% 42% at 50% 118%, rgba(255,90,10,0.32), transparent 72%),
-        radial-gradient(ellipse 55% 28% at 22% 108%, rgba(190,40,0,0.30), transparent 72%),
+        radial-gradient(ellipse 95% 42% at 50% 118%, rgba(255,80,10,0.34), transparent 72%),
+        radial-gradient(ellipse 55% 28% at 22% 108%, rgba(200,30,10,0.34), transparent 72%),
         radial-gradient(ellipse 55% 28% at 80% 110%, rgba(255,140,20,0.22), transparent 72%);
       animation: lavaPulse 7s ease-in-out infinite;
+    }
+
+    /* Золотая: тёплые искры */
+    [data-theme="gold"] body::before {
+      background-image:
+        radial-gradient(1.4px 1.4px at 30px 40px, var(--star-color), transparent),
+        radial-gradient(1px 1px at 140px 90px, var(--star-color), transparent),
+        radial-gradient(1.4px 1.4px at 70px 170px, var(--star-color), transparent),
+        radial-gradient(1px 1px at 190px 130px, var(--star-color), transparent);
+      background-size: 240px 240px;
+      opacity: 0.4;
+      animation: starDrift 160s linear infinite;
+    }
+
+    /* Сакура: нежное розовое свечение */
+    [data-theme="sakura"] body::before {
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 10%, rgba(255,143,191,0.16), transparent 65%),
+        radial-gradient(ellipse 60% 40% at 85% 20%, rgba(255,180,210,0.14), transparent 65%),
+        radial-gradient(ellipse 80% 40% at 50% 115%, rgba(160,58,104,0.30), transparent 70%);
+      animation: lavaPulse 9s ease-in-out infinite;
     }
 
     @keyframes lavaPulse {
@@ -2633,14 +2718,34 @@
     }
 
     :root .particle,
+    [data-theme="end"] .particle,
     [data-theme="purple"] .particle {
       animation-name: voidFloat;
       animation-timing-function: ease-in-out;
     }
 
-    [data-theme="gold"] .particle {
+    [data-theme="nether"] .particle {
       animation-name: emberFloat;
       animation-timing-function: ease-in;
+    }
+
+    [data-theme="gold"] .particle {
+      animation-name: voidFloat;
+      animation-timing-function: ease-in-out;
+    }
+
+    [data-theme="sakura"] .particle {
+      border-radius: 50% 0 50% 0;
+      animation-name: petalFall;
+      animation-timing-function: linear;
+    }
+
+    @keyframes petalFall {
+      0% { opacity: 0; transform: translateY(-5vh) translateX(0) rotate(0deg); }
+      10% { opacity: 0.9; }
+      50% { transform: translateY(45vh) translateX(28px) rotate(180deg); }
+      90% { opacity: 0.6; }
+      100% { opacity: 0; transform: translateY(105vh) translateX(-20px) rotate(360deg); }
     }
 
     @keyframes voidFloat {
@@ -2854,4 +2959,243 @@
       body::before, body::after, .toc-fab, .toc-panel { display: none !important; }
       .section-title::after { display: none; }
     }
+
+    /* ============================================================
+       ===== АТМОСФЕРА: ДРАКОН КРАЯ / ЛАВА АДА / ЛЕПЕСТКИ =====
+       ============================================================ */
+    .env-deco {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .env-layer { position: absolute; inset: 0; display: none; }
+
+    /* Дракон Края */
+    [data-theme="end"] .env-end { display: block; }
+    .end-dragon {
+      position: absolute;
+      top: 13%;
+      left: -420px;
+      width: 360px;
+      height: auto;
+      opacity: 0.5;
+      filter: drop-shadow(0 0 26px rgba(176,108,255,0.6));
+      animation: dragonFly 44s linear infinite;
+    }
+    @keyframes dragonFly {
+      0% { transform: translateX(0) translateY(0) scale(0.92); }
+      50% { transform: translateX(60vw) translateY(7vh) scale(1.06); }
+      100% { transform: translateX(130vw) translateY(-3vh) scale(0.92); }
+    }
+
+    /* Лава Ада по бокам */
+    [data-theme="nether"] .env-nether { display: block; }
+    .lava-column {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 44px;
+      background: linear-gradient(180deg, rgba(255,180,40,0) 0%, rgba(255,120,20,0.28) 14%, rgba(255,60,10,0.42) 100%);
+      overflow: hidden;
+    }
+    .lava-left { left: 0; }
+    .lava-right { right: 0; transform: scaleX(-1); }
+    .lava-column::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -160px;
+      bottom: -160px;
+      background:
+        radial-gradient(circle at 42% 38%, #ffd24d 0 5px, transparent 6px),
+        radial-gradient(circle at 66% 24%, #ff9b2a 0 7px, transparent 8px),
+        radial-gradient(circle at 30% 68%, #ff6a1a 0 6px, transparent 7px),
+        radial-gradient(circle at 70% 84%, #ffb347 0 5px, transparent 6px);
+      background-size: 100% 150px;
+      animation: lavaFlow 5.5s linear infinite;
+    }
+    @keyframes lavaFlow {
+      from { transform: translateY(-150px); }
+      to { transform: translateY(150px); }
+    }
+
+    @media (max-width: 768px) {
+      .end-dragon { width: 210px; opacity: 0.34; }
+      .lava-column { width: 24px; }
+    }
+
+    /* ============================================================
+       ===== НАСТРОЙКИ: АККАУНТ / ТЕМА / ОБРАЩЕНИЯ =====
+       ============================================================ */
+    .settings-box { max-width: 560px; max-height: 88vh; overflow-y: auto; }
+    .settings-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-card);
+      padding-bottom: 10px;
+    }
+    .settings-tab {
+      flex: 1;
+      padding: 9px 8px;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .settings-tab:hover { color: var(--gold-light); background: var(--border-card); }
+    .settings-tab.active {
+      color: var(--gold);
+      background: var(--border-card);
+      border-color: var(--border-gold);
+    }
+    .settings-note {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 22px 10px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .settings-select, .settings-box textarea, .settings-box input[type="text"],
+    .settings-box input[type="password"] {
+      width: 100%;
+      padding: 11px 13px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    .settings-box select, .settings-box textarea {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+    }
+    .settings-select:focus, .settings-box textarea:focus,
+    .settings-box input:focus { border-color: var(--gold); }
+    .settings-account-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-card);
+      margin-bottom: 16px;
+    }
+    .settings-account-head .nav-user-avatar { width: 52px; height: 52px; font-size: 1.3rem; }
+    .settings-account-name { color: var(--gold-light); font-size: 1.1rem; font-weight: 700; }
+    .settings-account-role { color: var(--text-muted); font-size: 0.78rem; }
+    .settings-section-label {
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 18px 0 12px;
+    }
+    .settings-danger {
+      border: 1px solid rgba(239,83,80,0.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+      background: rgba(239,83,80,0.05);
+    }
+    .settings-danger p { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+
+    /* Сетка тем */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .theme-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .theme-card:hover { border-color: var(--border-gold); transform: translateY(-2px); }
+    .theme-card.selected { border-color: var(--gold); box-shadow: 0 0 18px var(--glow-gold); }
+    .theme-swatch {
+      width: 100%;
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .swatch-end { background: linear-gradient(135deg, #08050f 0%, #2a1150 55%, #b06cff 100%); }
+    .swatch-nether { background: linear-gradient(135deg, #120406 0%, #4a0f10 55%, #ff6a1a 100%); }
+    .swatch-gold { background: linear-gradient(135deg, #0D0D0D 0%, #2A1E17 55%, #D4AF37 100%); }
+    .swatch-sakura { background: linear-gradient(135deg, #1a0d14 0%, #3a1a28 55%, #ff8fbf 100%); }
+    .theme-card-name { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+
+    /* Обращения */
+    .support-head { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .support-head .btn-gold { flex: 1; min-width: 140px; }
+    .link-back {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 4px 0 12px;
+    }
+    .link-back:hover { color: var(--gold); }
+    .ticket-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .ticket-row:hover { border-color: var(--border-gold); background: var(--border-card); }
+    .ticket-type { font-size: 1.3rem; flex-shrink: 0; }
+    .ticket-main { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+    .ticket-title { color: var(--text-primary); font-weight: 600; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ticket-meta { color: var(--text-muted); font-size: 0.7rem; }
+    .ticket-when { color: var(--text-muted); font-size: 0.68rem; flex-shrink: 0; }
+    .ticket-thread-head { padding-bottom: 12px; border-bottom: 1px solid var(--border-card); margin-bottom: 14px; }
+    .ticket-thread-title { color: var(--gold-light); font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .ticket-msgs { display: flex; flex-direction: column; gap: 10px; max-height: 42vh; overflow-y: auto; padding-right: 4px; margin-bottom: 14px; }
+    .ticket-msg {
+      max-width: 85%;
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border-card);
+      align-self: flex-start;
+    }
+    .ticket-msg.me { align-self: flex-end; background: var(--border-card); }
+    .ticket-msg.staff { border-color: var(--border-gold); }
+    .ticket-msg-author { font-size: 0.68rem; font-weight: 700; color: var(--gold); margin-bottom: 3px; }
+    .ticket-msg.me .ticket-msg-author { color: var(--text-muted); }
+    .ticket-msg-text { font-size: 0.86rem; color: var(--text-primary); line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+    .ticket-btns { display: flex; gap: 8px; margin-top: 8px; }
+    .ticket-btns .btn-gold { flex: 1; }
   

@@ -3,8 +3,13 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function isStaff() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
-        in ['admin', 'sheriff', 'deputy'];
+      return request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+           in ['admin', 'sheriff', 'deputy'];
+    }
+
+    function ticketOwner(ticketId) {
+      return get(/databases/$(database)/documents/tickets/$(ticketId)).data.userId;
     }
 
     // Пользователи
@@ -13,7 +18,9 @@ service cloud.firestore {
       allow create: if request.auth != null
         && request.auth.uid == userId
         && request.resource.data.role == 'user';
-      allow update, delete: if isStaff();
+      allow update: if isStaff();
+      allow delete: if isStaff()
+        || (request.auth != null && request.auth.uid == userId);
     }
 
     // Оценки
@@ -49,12 +56,24 @@ service cloud.firestore {
       allow write: if isStaff();
     }
 
-    // Тикеты
+    // Обращения к администрации (видны только автору и стаффу)
     match /tickets/{ticketId} {
-      allow read: if true;
-      allow create: if request.auth != null;
+      allow read: if isStaff()
+        || (request.auth != null && resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
       allow update, delete: if request.auth != null
         && (resource.data.userId == request.auth.uid || isStaff());
+
+      match /messages/{msgId} {
+        allow read: if isStaff()
+          || (request.auth != null && ticketOwner(ticketId) == request.auth.uid);
+        allow create: if request.auth != null
+          && request.resource.data.senderId == request.auth.uid
+          && request.resource.data.isStaff == isStaff()
+          && (isStaff() || ticketOwner(ticketId) == request.auth.uid);
+        allow update, delete: if false;
+      }
     }
   }
 }
